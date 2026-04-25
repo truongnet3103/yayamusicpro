@@ -376,7 +376,7 @@ export function HomePage() {
         <LandingNav />
 
         {/* ── HERO ── */}
-        <section style={{
+        <section className="hp-hero" style={{
           minHeight: '100vh', display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center', textAlign: 'center',
           padding: '120px 40px 80px', position: 'relative',
@@ -422,7 +422,7 @@ export function HomePage() {
             với đội ngũ giảng viên đẳng cấp quốc tế.
           </p>
 
-          <div style={{
+          <div className="hp-hero-btns" style={{
             display: 'flex', gap: 16, alignItems: 'center', justifyContent: 'center',
             marginTop: 52, animation: 'heroFadeUp 0.9s 0.75s both',
           }}>
@@ -498,7 +498,7 @@ export function HomePage() {
 
         {/* ── STATS ── */}
         <Reveal>
-          <div style={{
+          <div className="hp-stats-row" style={{
             display: 'flex', justifyContent: 'center',
             borderTop: '1px solid rgba(201,168,76,0.12)',
             borderBottom: '1px solid rgba(201,168,76,0.12)',
@@ -506,7 +506,7 @@ export function HomePage() {
             backdropFilter: 'blur(12px)',
           }}>
             {displayStats.slice(0, 4).map((stat, i) => (
-              <div key={i} style={{
+              <div key={i} className="hp-stat-item" style={{
                 flex: '1', maxWidth: 280, padding: '52px 40px', textAlign: 'center',
                 borderRight: i < 3 ? '1px solid rgba(201,168,76,0.08)' : 'none',
                 transition: 'background 0.3s',
@@ -536,7 +536,7 @@ export function HomePage() {
         </div>
 
         {/* ── COURSES ── */}
-        <section style={{ padding: '120px 60px' }}>
+        <section className="hp-section" style={{ padding: '120px 60px' }}>
           <Reveal>
             <div style={{ fontSize: '0.7rem', fontWeight: 500, letterSpacing: '0.25em', textTransform: 'uppercase', color: gold, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
               <span style={{ display: 'block', width: 24, height: 1, background: gold, opacity: 0.6 }} />
@@ -548,7 +548,7 @@ export function HomePage() {
           </Reveal>
 
           <Reveal delay={150}>
-            <div style={{
+            <div className="hp-grid-3" style={{
               display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
               gap: 1, background: 'rgba(201,168,76,0.08)',
               marginTop: 72, border: '1px solid rgba(201,168,76,0.08)',
@@ -572,7 +572,7 @@ export function HomePage() {
         </div>
 
         {/* ── TESTIMONIALS ── */}
-        <section style={{ padding: '120px 60px' }}>
+        <section className="hp-section" style={{ padding: '120px 60px' }}>
           <Reveal>
             <div style={{ textAlign: 'center', marginBottom: 0 }}>
               <div style={{ fontSize: '0.7rem', fontWeight: 500, letterSpacing: '0.25em', textTransform: 'uppercase', color: gold, marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
@@ -587,7 +587,7 @@ export function HomePage() {
           </Reveal>
 
           <Reveal delay={150}>
-            <div style={{
+            <div className="hp-grid-3" style={{
               display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
               gap: 1, background: 'rgba(201,168,76,0.06)',
               border: '1px solid rgba(201,168,76,0.06)', marginTop: 72,
@@ -601,7 +601,7 @@ export function HomePage() {
 
         {/* ── CTA ── */}
         <Reveal>
-          <section style={{
+          <section className="hp-cta-section" style={{
             textAlign: 'center', padding: '140px 60px',
             position: 'relative', overflow: 'hidden',
           }}>
@@ -627,7 +627,7 @@ export function HomePage() {
             <p style={{ fontSize: '1rem', fontWeight: 300, color: 'rgba(240,236,224,0.45)', marginBottom: 52, position: 'relative' }}>
               Đăng ký tư vấn miễn phí — Chúng tôi sẽ thiết kế lộ trình học tập<br />phù hợp nhất với bạn trong vòng 24 giờ.
             </p>
-            <div style={{ display: 'flex', gap: 16, justifyContent: 'center', position: 'relative' }}>
+            <div className="hp-hero-btns" style={{ display: 'flex', gap: 16, justifyContent: 'center', position: 'relative' }}>
               <Link to="/login">
                 <button style={{
                   padding: '16px 44px',
@@ -656,7 +656,7 @@ export function HomePage() {
         </Reveal>
 
         {/* ── FOOTER ── */}
-        <footer style={{
+        <footer className="hp-footer" style={{
           padding: 60, borderTop: '1px solid rgba(201,168,76,0.1)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           background: 'rgba(6,4,5,0.8)',
@@ -670,7 +670,7 @@ export function HomePage() {
         </footer>
       </div>
 
-      {/* Global keyframes */}
+      {/* Global keyframes + responsive */}
       <style>{`
         @keyframes heroFadeUp {
           from { opacity: 0; transform: translateY(24px); }
@@ -690,6 +690,67 @@ export function HomePage() {
         @keyframes pulse {
           0%, 100% { opacity: 1; transform: scale(1); }
           50%       { opacity: 0.5; transform: scale(1.4); }
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+          .hp-hero {
+            padding: 100px 24px 60px !important;
+          }
+          .hp-hero-btns {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            width: 100%;
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
+          }
+          .hp-hero-btns a,
+          .hp-hero-btns button {
+            width: 100% !important;
+          }
+          .hp-hero-btns a button {
+            width: 100% !important;
+            padding-left: 24px !important;
+            padding-right: 24px !important;
+          }
+
+          .hp-stats-row {
+            flex-wrap: wrap !important;
+          }
+          .hp-stat-item {
+            flex: 1 1 50% !important;
+            max-width: 50% !important;
+            padding: 32px 20px !important;
+            border-right: none !important;
+            border-bottom: 1px solid rgba(201,168,76,0.08) !important;
+          }
+
+          .hp-section {
+            padding: 72px 24px !important;
+          }
+
+          .hp-grid-3 {
+            grid-template-columns: 1fr !important;
+          }
+
+          .hp-cta-section {
+            padding: 80px 24px !important;
+          }
+
+          .hp-footer {
+            flex-direction: column !important;
+            gap: 16px !important;
+            padding: 40px 24px !important;
+            text-align: center !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .hp-stat-item {
+            flex: 1 1 100% !important;
+            max-width: 100% !important;
+          }
         }
       `}</style>
     </div>
