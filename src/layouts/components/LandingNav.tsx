@@ -1,88 +1,114 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 
 export function LandingNav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const navLinks = [
-    { name: 'Tính Năng', href: '#features' },
-    { name: 'Học Phí', href: '#pricing' },
-    { name: 'Về Chúng Tôi', href: '#about' },
+    { name: 'Trang Chủ', to: '/landingpage' },
+    { name: 'Học Phí', to: '/hoc-phi' },
+    { name: 'Blog', to: '/blog' },
+    { name: 'Về Chúng Tôi', to: '/ve-chung-toi' },
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gold/20 shadow-sm">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? 'bg-navy/95 backdrop-blur-md shadow-lg shadow-black/30'
+          : 'bg-gradient-to-b from-black/60 to-transparent backdrop-blur-none'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2 group">
-            <span className="text-2xl text-primary font-display leading-none">♪</span>
-            <span className="text-xl font-display font-bold text-primary tracking-wide">YayaMusic</span>
+        <div className="flex items-center justify-between h-20">
+          {/* Logo */}
+          <Link to="/landingpage" className="flex items-center shrink-0">
+            <img src="/logo.png" alt="YayaMusic" className="h-14 w-auto object-contain drop-shadow-lg" />
           </Link>
 
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="text-charcoal hover:text-primary font-body font-medium transition-colors"
-              >
-                {link.name}
-              </a>
-            ))}
+          {/* Desktop Nav Links */}
+          <div className="hidden md:flex items-center gap-1">
+            {navLinks.map((link) => {
+              const active = location.pathname === link.to;
+              return (
+                <Link
+                  key={link.name}
+                  to={link.to}
+                  className={`relative px-4 py-2 font-body font-medium text-sm tracking-wide transition-all duration-200 rounded-md group ${
+                    active
+                      ? 'text-gold'
+                      : 'text-white/85 hover:text-gold'
+                  }`}
+                >
+                  {link.name}
+                  <span
+                    className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-gold transition-all duration-200 rounded-full ${
+                      active ? 'w-4/5' : 'w-0 group-hover:w-1/2'
+                    }`}
+                  />
+                </Link>
+              );
+            })}
           </div>
 
-          <div className="hidden md:flex items-center gap-4">
+          {/* Desktop CTA */}
+          <div className="hidden md:flex items-center">
             <Link
               to="/login"
-              className="text-charcoal hover:text-primary font-body font-medium transition-colors"
+              className="px-5 py-2 border border-gold/60 text-gold font-body font-semibold text-sm rounded-full hover:bg-gold hover:text-navy transition-all duration-200 tracking-wide"
             >
               Đăng Nhập
             </Link>
-            <Link
-              to="/login"
-              className="bg-primary text-white px-6 py-2 rounded-lg font-body font-semibold hover:bg-primary-light transition-colors shadow-sm"
-            >
-              Dùng Thử Miễn Phí
-            </Link>
           </div>
 
+          {/* Mobile Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-charcoal hover:bg-cream-dark rounded-lg transition-colors"
+            className="md:hidden p-2 text-white/80 hover:text-gold rounded-lg transition-colors"
+            aria-label="Mở menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
 
+      {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-gold/20 bg-white">
-          <div className="px-4 py-4 space-y-3">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="block py-2 text-charcoal hover:text-primary font-body font-medium transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {link.name}
-              </a>
-            ))}
-            <div className="pt-3 border-t border-gold/20 space-y-2">
+        <div className="md:hidden bg-navy/98 backdrop-blur-md border-t border-gold/20">
+          <div className="px-4 py-5 space-y-1">
+            {navLinks.map((link) => {
+              const active = location.pathname === link.to;
+              return (
+                <Link
+                  key={link.name}
+                  to={link.to}
+                  className={`block px-4 py-3 rounded-lg font-body font-medium transition-colors ${
+                    active
+                      ? 'text-gold bg-gold/10'
+                      : 'text-white/80 hover:text-gold hover:bg-white/5'
+                  }`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
+            <div className="pt-3 border-t border-gold/20">
               <Link
                 to="/login"
-                className="block py-2 text-charcoal hover:text-primary font-body font-medium transition-colors"
+                className="block w-full text-center py-3 border border-gold/60 text-gold font-body font-semibold rounded-full hover:bg-gold hover:text-navy transition-all duration-200"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Đăng Nhập
-              </Link>
-              <Link
-                to="/login"
-                className="block w-full text-center bg-primary text-white px-6 py-2 rounded-lg font-body font-semibold hover:bg-primary-light transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Dùng Thử Miễn Phí
               </Link>
             </div>
           </div>

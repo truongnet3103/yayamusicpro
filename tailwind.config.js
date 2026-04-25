@@ -27,7 +27,7 @@ export default {
       fontFamily: {
         display: ['Playfair Display', 'Georgia', 'serif'],
         body: ['Be Vietnam Pro', 'Inter', 'sans-serif'],
-        accent: ['EB Garamond', 'Georgia', 'serif'],
+        accent: ['Lora', 'Georgia', 'serif'],
       },
       boxShadow: {
         elegant: '0 4px 24px rgba(107, 45, 62, 0.12)',
