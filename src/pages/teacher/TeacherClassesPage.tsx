@@ -1,15 +1,7 @@
-/**
- * Teacher Classes Page
- * 
- * Shows all classes assigned to the teacher
- * School-scoped and respects multi-tenancy
- */
-
-import { BookOpen, Users, Calendar, Clock, Search } from 'lucide-react';
+import { BookOpen, Users, Search, Calendar, Clock } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from '../../domains/auth/contexts/UserContext';
-import { useTenant } from '../../shared/contexts/TenantContext';
 import { RoleGuard } from '../../shared/components/guards/RoleGuard';
 import { PermissionGuard } from '../../shared/components/guards/PermissionGuard';
 import { supabase } from '../../shared/lib/supabase';
@@ -21,183 +13,199 @@ interface TeacherClass {
   course_name?: string;
   grade_level?: string;
   section?: string;
-  student_count?: number;
   schedule?: string;
+  schedule_days?: string[];
+  start_time?: string;
+  end_time?: string;
+  room?: string;
+  status: string;
+  student_count: number;
 }
+
+const DAY_LABELS: Record<string, string> = {
+  mon: 'T2', tue: 'T3', wed: 'T4', thu: 'T5', fri: 'T6', sat: 'T7', sun: 'CN',
+};
 
 function TeacherClassesPageContent() {
   const { profile } = useUser();
-  const { school } = useTenant();
   const [classes, setClasses] = useState<TeacherClass[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const schoolId = school?.id || profile?.school_id;
-
   useEffect(() => {
-    if (!schoolId || !profile?.id) return;
+    if (!profile?.id || !profile?.school_id) return;
 
     const loadClasses = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-        // Fetch classes assigned to this teacher, scoped by school
+        // Resolve domain teacher ID from auth user ID
+        const { data: teacherRow, error: tErr } = await supabase
+          .from('teachers')
+          .select('id')
+          .eq('user_id', profile.id)
+          .eq('school_id', profile.school_id)
+          .single();
+
+        if (tErr || !teacherRow) {
+          setClasses([]);
+          setLoading(false);
+          return;
+        }
+
         const { data, error } = await supabase
           .from('classes')
           .select(`
-            id,
-            name,
-            code,
-            grade_level,
-            section,
+            id, name, code, grade_level, section, schedule,
+            schedule_days, start_time, end_time, room, status,
             courses(name)
           `)
-          .eq('school_id', schoolId)
-          .eq('teacher_id', profile.id)
-          .eq('is_active', true)
+          .eq('school_id', profile.school_id)
+          .eq('teacher_id', teacherRow.id)
+          .eq('status', 'active')
           .order('name');
 
         if (error) throw error;
 
-        // Fetch student counts separately
+        // Fetch student counts from enrollments
         let enrollmentCounts: Record<string, number> = {};
         if (data && data.length > 0) {
           const classIds = data.map((cls: any) => cls.id);
           const { data: enrollments } = await supabase
-            .from('class_enrollments')
+            .from('enrollments')
             .select('class_id')
-            .in('class_id', classIds);
+            .in('class_id', classIds)
+            .eq('status', 'active');
 
-          enrollmentCounts = (enrollments || []).reduce((acc: Record<string, number>, enrollment: any) => {
-            acc[enrollment.class_id] = (acc[enrollment.class_id] || 0) + 1;
+          enrollmentCounts = (enrollments || []).reduce((acc: Record<string, number>, e: any) => {
+            acc[e.class_id] = (acc[e.class_id] || 0) + 1;
             return acc;
           }, {});
         }
 
-        const formattedClasses: TeacherClass[] = (data || []).map((cls: any) => ({
+        setClasses((data || []).map((cls: any) => ({
           id: cls.id,
           name: cls.name,
           code: cls.code,
           course_name: cls.courses?.name,
           grade_level: cls.grade_level,
           section: cls.section,
+          schedule: cls.schedule,
+          schedule_days: cls.schedule_days,
+          start_time: cls.start_time,
+          end_time: cls.end_time,
+          room: cls.room,
+          status: cls.status,
           student_count: enrollmentCounts[cls.id] || 0,
-        }));
-
-        setClasses(formattedClasses);
-      } catch (error) {
-        console.error('Error loading classes:', error);
+        })));
+      } catch (err) {
+        console.error('Error loading classes:', err);
       } finally {
         setLoading(false);
       }
     };
 
     loadClasses();
-  }, [schoolId, profile?.id]);
+  }, [profile?.id, profile?.school_id]);
 
   const filteredClasses = classes.filter(cls =>
     cls.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    cls.code?.toLowerCase().includes(searchQuery.toLowerCase())
+    (cls.code ?? '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Classes</h1>
-          <p className="text-gray-600">View all classes assigned to you</p>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold text-navy font-display">Lớp Dạy Của Tôi</h1>
+        <p className="text-charcoal/60 font-body text-sm mt-1">Các lớp học được phân công</p>
       </div>
 
-      {/* Search */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search classes..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-charcoal/40" />
+        <input
+          type="text"
+          placeholder="Tìm kiếm lớp học..."
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          className="w-full pl-9 pr-4 py-2.5 border border-gold/30 rounded-lg bg-white font-body text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+        />
       </div>
 
-      {/* Classes Grid */}
       {filteredClasses.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-          <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            {searchQuery ? 'No classes found' : 'No classes assigned'}
+        <div className="bg-white rounded-xl shadow-card border border-gold/20 p-12 text-center">
+          <BookOpen className="w-16 h-16 text-gold/30 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-navy font-display mb-2">
+            {searchQuery ? 'Không tìm thấy lớp học' : 'Chưa có lớp học nào'}
           </h3>
-          <p className="text-gray-600">
-            {searchQuery ? 'Try adjusting your search' : 'You don\'t have any classes assigned yet'}
+          <p className="text-charcoal/60 font-body text-sm">
+            {searchQuery ? 'Thử thay đổi từ khóa tìm kiếm' : 'Bạn chưa được phân công lớp học nào'}
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredClasses.map((cls) => (
-            <Link
-              key={cls.id}
-              to={`/teacher/classes/${cls.id}`}
-              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <BookOpen className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{cls.name}</h3>
-                    {cls.code && <p className="text-sm text-gray-600">{cls.code}</p>}
-                  </div>
+          {filteredClasses.map(cls => (
+            <div key={cls.id} className="bg-white rounded-xl shadow-card border border-gold/20 p-5 hover:shadow-elegant transition-shadow">
+              <div className="flex items-start gap-3 mb-4">
+                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <BookOpen className="w-5 h-5 text-primary" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-semibold text-navy font-body leading-tight">{cls.name}</h3>
+                  <p className="text-xs text-charcoal/50 font-body mt-0.5">{cls.code}</p>
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5 mb-4">
                 {cls.course_name && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <span>{cls.course_name}</span>
-                  </div>
+                  <p className="text-xs text-charcoal/60 font-body">{cls.course_name}</p>
                 )}
-                {cls.grade_level && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <span>Grade {cls.grade_level}</span>
-                    {cls.section && <span>• Section {cls.section}</span>}
-                  </div>
-                )}
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Users className="w-4 h-4" />
-                  <span>{cls.student_count || 0} students</span>
+                <div className="flex items-center gap-1.5 text-xs text-charcoal/60 font-body">
+                  <Users className="w-3.5 h-3.5 text-charcoal/30" />
+                  <span>{cls.student_count} học viên</span>
                 </div>
+                {cls.schedule_days && cls.schedule_days.length > 0 ? (
+                  <div className="flex items-center gap-1.5 text-xs text-charcoal/60 font-body">
+                    <Calendar className="w-3.5 h-3.5 text-charcoal/30" />
+                    <span>{cls.schedule_days.map(d => DAY_LABELS[d] ?? d).join(', ')}</span>
+                    {cls.start_time && (
+                      <span>• {cls.start_time.slice(0, 5)}
+                        {cls.end_time ? `–${cls.end_time.slice(0, 5)}` : ''}
+                      </span>
+                    )}
+                  </div>
+                ) : cls.schedule ? (
+                  <div className="flex items-center gap-1.5 text-xs text-charcoal/60 font-body">
+                    <Clock className="w-3.5 h-3.5 text-charcoal/30" />
+                    <span className="truncate">{cls.schedule}</span>
+                  </div>
+                ) : null}
+                {cls.room && (
+                  <p className="text-xs text-charcoal/50 font-body">Phòng: {cls.room}</p>
+                )}
               </div>
 
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <div className="flex items-center gap-4 text-sm">
-                  <Link
-                    to={`/teacher/attendance/${cls.id}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="text-blue-600 hover:text-blue-700 font-medium"
-                  >
-                    Mark Attendance
-                  </Link>
-                  <Link
-                    to={`/teacher/gradebook/${cls.id}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="text-gray-600 hover:text-gray-700"
-                  >
-                    Gradebook
-                  </Link>
-                </div>
+              <div className="pt-3 border-t border-gold/20 flex items-center gap-3 text-xs font-body">
+                <Link
+                  to={`/teacher/attendance/${cls.id}`}
+                  className="text-primary hover:text-primary-light font-semibold transition-colors"
+                >
+                  Điểm danh
+                </Link>
+                <Link
+                  to={`/teacher/gradebook/${cls.id}`}
+                  className="text-charcoal/60 hover:text-charcoal transition-colors"
+                >
+                  Nhật ký
+                </Link>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}

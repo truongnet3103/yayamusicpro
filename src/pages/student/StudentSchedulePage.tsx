@@ -1,6 +1,6 @@
 /**
  * Student Schedule Page
- * 
+ *
  * View own class schedule
  * School-scoped and respects multi-tenancy
  */
@@ -32,7 +32,7 @@ function StudentSchedulePageContent() {
         setLoading(true);
         // TODO: Replace with actual schedule API call
         // GET /schedule?student_id={profile.id}&school_id={schoolId}&date={selectedDate}
-        
+
         // Placeholder data structure
         const placeholderSchedule: any[] = [];
         setSchedule(placeholderSchedule);
@@ -58,53 +58,53 @@ function StudentSchedulePageContent() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">My Schedule</h1>
-        <p className="text-gray-600">View your class schedule</p>
+        <h1 className="font-display text-2xl font-bold text-navy">Lịch Học</h1>
+        <p className="font-body text-charcoal/70">Xem lịch học của bạn</p>
       </div>
 
       {/* Date Selector */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <div className="flex items-center gap-4">
-          <label className="text-sm font-medium text-gray-700">Date:</label>
+      <div className="bg-white rounded-xl border border-gold/20 shadow-card p-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <label className="font-body text-sm font-medium text-charcoal/70">Ngày:</label>
           <input
             type="date"
             value={selectedDate.toISOString().split('T')[0]}
             onChange={(e) => setSelectedDate(new Date(e.target.value))}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border border-gold/40 rounded-lg font-body text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
           />
           <button
             onClick={() => setSelectedDate(new Date())}
-            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-primary text-white font-body text-sm font-semibold rounded-lg hover:bg-primary-light transition-colors"
           >
-            Today
+            Hôm nay
           </button>
         </div>
       </div>
 
       {/* Schedule List */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          {selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+      <div className="bg-white rounded-xl border border-gold/20 shadow-card p-6">
+        <h2 className="font-display text-lg font-semibold text-navy mb-4">
+          {selectedDate.toLocaleDateString('vi-VN', { weekday: 'long', month: 'long', day: 'numeric' })}
         </h2>
-        
+
         {todaySchedule.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-            <p>No classes scheduled for this day</p>
+          <div className="text-center py-12">
+            <Calendar className="w-12 h-12 mx-auto mb-3 text-charcoal/20" />
+            <p className="font-body text-charcoal/50">Ngày này không có lịch học</p>
           </div>
         ) : (
           <div className="space-y-4">
             {todaySchedule.map((item) => (
               <div
                 key={item.id}
-                className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                className="flex items-start gap-4 p-4 bg-cream-dark rounded-xl border border-gold/10 hover:bg-primary/5 transition-colors"
               >
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Clock className="w-5 h-5 text-blue-600" />
+                <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0">
+                  <Clock className="w-5 h-5 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 mb-1">{item.class_name}</h3>
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                  <h3 className="font-body font-semibold text-navy mb-1">{item.class_name}</h3>
+                  <div className="flex flex-wrap items-center gap-4 font-body text-sm text-charcoal/60">
                     <span className="flex items-center gap-1">
                       <Clock className="w-4 h-4" />
                       {item.start_time} - {item.end_time}
@@ -126,10 +126,10 @@ function StudentSchedulePageContent() {
       </div>
 
       {/* Weekly View (Future Enhancement) */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Weekly Schedule</h2>
-        <p className="text-sm text-gray-600">
-          Weekly schedule view coming soon. For now, use the date selector above to view specific days.
+      <div className="bg-white rounded-xl border border-gold/20 shadow-card p-6">
+        <h2 className="font-display text-lg font-semibold text-navy mb-4">Lịch Theo Tuần</h2>
+        <p className="font-body text-sm text-charcoal/60">
+          Lịch học theo tuần đang được phát triển. Hiện tại hãy dùng bộ chọn ngày ở trên để xem lịch theo từng ngày.
         </p>
       </div>
     </div>

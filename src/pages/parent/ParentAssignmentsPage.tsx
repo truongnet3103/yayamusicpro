@@ -1,11 +1,11 @@
 /**
  * Parent Assignments Page
- * 
+ *
  * View assignments for all children
  * School-scoped and respects multi-tenancy
  */
 
-import { FileText, Users, Calendar, Clock } from 'lucide-react';
+import { FileText, Users, Calendar } from 'lucide-react';
 import { useState } from 'react';
 import { useUser } from '../../domains/auth/contexts/UserContext';
 import { RoleGuard } from '../../shared/components/guards/RoleGuard';
@@ -14,7 +14,7 @@ import { useParentStudents } from '../../domains/academic/hooks/useParentStudent
 import { DashboardSkeleton } from '../../shared/components/LoadingSkeleton';
 
 function ParentAssignmentsPageContent() {
-  const { profile } = useUser();
+  useUser();
   const { data: students, loading: studentsLoading } = useParentStudents();
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
 
@@ -36,13 +36,13 @@ function ParentAssignmentsPageContent() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Assignments</h1>
-          <p className="text-gray-600">View assignments for your children</p>
+          <h1 className="font-display text-2xl font-bold text-navy">Bài Tập Luyện</h1>
+          <p className="font-body text-charcoal/70">Xem bài tập của con em</p>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-          <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Children Linked</h3>
-          <p className="text-gray-600">No children are currently linked to your account.</p>
+        <div className="bg-white rounded-xl border border-gold/20 shadow-card p-12 text-center">
+          <Users className="w-16 h-16 text-charcoal/20 mx-auto mb-4" />
+          <h3 className="font-display text-lg font-semibold text-navy mb-2">Chưa Liên Kết Học Viên</h3>
+          <p className="font-body text-charcoal/70">Chưa có học viên nào được liên kết với tài khoản.</p>
         </div>
       </div>
     );
@@ -52,25 +52,37 @@ function ParentAssignmentsPageContent() {
     ? assignments.filter(a => a.student_id === selectedStudentId)
     : assignments;
 
+  const statusLabel: Record<string, string> = {
+    pending: 'Chưa nộp',
+    submitted: 'Đã nộp',
+    graded: 'Đã chấm',
+  };
+
+  const statusStyle: Record<string, string> = {
+    graded: 'bg-primary/10 text-primary',
+    submitted: 'bg-gold/10 text-gold-dark',
+    pending: 'bg-charcoal/10 text-charcoal',
+  };
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Assignments</h1>
-        <p className="text-gray-600">View assignments for your children</p>
+        <h1 className="font-display text-2xl font-bold text-navy">Bài Tập Luyện</h1>
+        <p className="font-body text-charcoal/70">Xem bài tập của con em</p>
       </div>
 
       {students.length > 1 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Select a Child</h2>
+        <div className="bg-white rounded-xl border border-gold/20 shadow-card p-6">
+          <h2 className="font-display text-lg font-semibold text-navy mb-4">Chọn Học Viên</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {students.map((student) => (
               <button
                 key={student.id}
                 onClick={() => setSelectedStudentId(selectedStudentId === student.id ? null : student.id)}
-                className={`p-4 rounded-lg border transition-colors text-left ${
+                className={`p-4 rounded-xl border transition-colors text-left ${
                   selectedStudentId === student.id
-                    ? 'bg-blue-50 border-blue-200'
-                    : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                    ? 'bg-primary/5 border-primary/30'
+                    : 'bg-cream-dark border-gold/20 hover:bg-primary/5'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -81,15 +93,15 @@ function ParentAssignmentsPageContent() {
                       className="w-10 h-10 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center">
-                      <span className="text-sm font-semibold text-blue-600">
+                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                      <span className="font-display text-sm font-semibold text-primary">
                         {student.first_name[0]}{student.last_name[0]}
                       </span>
                     </div>
                   )}
                   <div>
-                    <h3 className="font-medium text-gray-900">{student.full_name}</h3>
-                    <p className="text-xs text-gray-600">{student.grade}</p>
+                    <h3 className="font-body font-medium text-navy">{student.full_name}</h3>
+                    <p className="font-body text-xs text-charcoal/70">{student.grade}</p>
                   </div>
                 </div>
               </button>
@@ -99,47 +111,41 @@ function ParentAssignmentsPageContent() {
       )}
 
       {/* Assignments Display */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">All Assignments</h2>
-        
+      <div className="bg-white rounded-xl border border-gold/20 shadow-card p-6">
+        <h2 className="font-display text-lg font-semibold text-navy mb-4">Tất Cả Bài Tập</h2>
+
         {filteredAssignments.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <FileText className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-            <p>No assignments available yet</p>
-            <p className="text-sm mt-2">Assignments will appear here when teachers post them</p>
+          <div className="text-center py-12 text-charcoal/50">
+            <FileText className="w-12 h-12 mx-auto mb-3 text-charcoal/20" />
+            <p className="font-body">Chưa có bài tập nào</p>
+            <p className="font-body text-sm mt-2">Bài tập sẽ hiển thị ở đây khi giảng viên giao</p>
           </div>
         ) : (
           <div className="space-y-3">
             {filteredAssignments.map((assignment) => (
               <div
                 key={assignment.id}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200"
+                className="flex items-center justify-between p-4 bg-cream-dark rounded-xl border border-gold/10"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <FileText className="w-5 h-5 text-purple-600" />
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <FileText className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-gray-900">{assignment.title}</h3>
-                    <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                    <h3 className="font-body font-medium text-navy">{assignment.title}</h3>
+                    <div className="flex items-center gap-3 mt-1 text-xs text-charcoal/50 font-body">
                       <span>{assignment.subject}</span>
                       <span>•</span>
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
-                        Due: {new Date(assignment.due_date).toLocaleDateString()}
+                        Hạn: {new Date(assignment.due_date).toLocaleDateString('vi-VN')}
                       </span>
                     </div>
                   </div>
                 </div>
                 <div>
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                    assignment.status === 'graded'
-                      ? 'bg-green-100 text-green-800'
-                      : assignment.status === 'submitted'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {assignment.status}
+                  <span className={`px-3 py-1 text-xs font-body font-medium rounded-full ${statusStyle[assignment.status] || 'bg-charcoal/10 text-charcoal'}`}>
+                    {statusLabel[assignment.status] || assignment.status}
                   </span>
                 </div>
               </div>

@@ -95,57 +95,55 @@ export function NotificationDropdown({
     const now = new Date();
     const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-    if (seconds < 60) return 'Just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
-    return date.toLocaleDateString('en-PH');
+    if (seconds < 60) return 'Vừa xong';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)} phút trước`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)} giờ trước`;
+    if (seconds < 604800) return `${Math.floor(seconds / 86400)} ngày trước`;
+    return date.toLocaleDateString('vi-VN');
   }
 
   function getPriorityColor(priority: string): string {
     switch (priority) {
       case 'urgent':
-        return 'bg-red-100 border-red-300';
+        return 'bg-red-50 border-red-200';
       case 'high':
-        return 'bg-orange-100 border-orange-300';
+        return 'bg-orange-50 border-orange-200';
       case 'low':
-        return 'bg-gray-50 border-gray-200';
+        return 'bg-cream border-gold/30';
       default:
-        return 'bg-blue-50 border-blue-200';
+        return 'bg-primary/5 border-primary/20';
     }
   }
 
   return (
     <div
       ref={dropdownRef}
-      className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 z-50"
+      className="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-elegant border border-gold/20 z-50"
     >
-      <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleMarkAllAsRead}
-            className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
-            title="Mark all as read"
-          >
-            <CheckCheck className="w-4 h-4" />
-            Mark all read
-          </button>
-        </div>
+      <div className="px-4 py-3 border-b border-gold/20 flex items-center justify-between">
+        <h3 className="text-base font-semibold text-navy font-display">Thông báo</h3>
+        <button
+          onClick={handleMarkAllAsRead}
+          className="text-xs text-primary hover:text-primary-light font-body font-medium flex items-center gap-1 transition-colors"
+          title="Đánh dấu tất cả đã đọc"
+        >
+          <CheckCheck className="w-3.5 h-3.5" />
+          Đánh dấu tất cả đã đọc
+        </button>
       </div>
 
       <div className="max-h-96 overflow-y-auto">
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         ) : notifications.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <Bell className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-            <p>No notifications</p>
+          <div className="text-center py-12 text-charcoal/50">
+            <Bell className="w-12 h-12 mx-auto mb-3 text-gold/40" />
+            <p className="font-body text-sm">Không có thông báo mới</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-gold/10">
             {notifications.map(notification => {
               const Icon = iconMap[notification.icon || 'alert-circle'] || AlertCircle;
               const isUnread = notification.status !== 'read';
@@ -153,8 +151,8 @@ export function NotificationDropdown({
               return (
                 <div
                   key={notification.id}
-                  className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
-                    isUnread ? 'bg-blue-50/50' : ''
+                  className={`p-4 hover:bg-cream/60 cursor-pointer transition-colors ${
+                    isUnread ? 'bg-primary/5' : ''
                   }`}
                   onClick={() => {
                     if (isUnread) handleMarkAsRead(notification.id);
@@ -165,21 +163,21 @@ export function NotificationDropdown({
                 >
                   <div className="flex items-start gap-3">
                     <div
-                      className={`p-2 rounded-lg ${getPriorityColor(notification.priority)}`}
+                      className={`p-2 rounded-lg border ${getPriorityColor(notification.priority)}`}
                     >
-                      <Icon className="w-5 h-5 text-gray-700" />
+                      <Icon className="w-4 h-4 text-charcoal/70" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
-                        <p className="font-medium text-gray-900 text-sm">
+                        <p className="font-semibold text-navy font-body text-sm">
                           {notification.title}
                         </p>
                         {isUnread && (
-                          <span className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0 mt-1"></span>
+                          <span className="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-1"></span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">{notification.body}</p>
-                      <p className="text-xs text-gray-400 mt-2">
+                      <p className="text-sm text-charcoal/70 font-body mt-0.5">{notification.body}</p>
+                      <p className="text-xs text-charcoal/40 font-body mt-1.5">
                         {getTimeAgo(notification.created_at)}
                       </p>
                     </div>
@@ -191,15 +189,15 @@ export function NotificationDropdown({
         )}
       </div>
 
-      <div className="p-3 border-t border-gray-200 bg-gray-50">
+      <div className="px-4 py-2.5 border-t border-gold/20 bg-cream/40 rounded-b-xl">
         <button
           onClick={() => {
             onClose();
           }}
-          className="w-full text-center text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center justify-center gap-2"
+          className="w-full text-center text-sm text-charcoal/60 hover:text-primary font-body font-medium flex items-center justify-center gap-2 transition-colors py-0.5"
         >
-          <Settings className="w-4 h-4" />
-          Notification Settings
+          <Settings className="w-3.5 h-3.5" />
+          Cài đặt thông báo
         </button>
       </div>
     </div>

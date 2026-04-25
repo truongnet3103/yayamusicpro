@@ -1,6 +1,6 @@
 /**
  * Student Attendance Page
- * 
+ *
  * View own attendance records
  * School-scoped and respects multi-tenancy
  */
@@ -21,11 +21,11 @@ function StudentAttendancePageContent() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">My Attendance</h1>
-        <p className="text-gray-600">View your attendance records</p>
+        <h1 className="font-display text-2xl font-bold text-navy">Điểm Danh Của Tôi</h1>
+        <p className="font-body text-charcoal/70">Xem lịch sử điểm danh của bạn</p>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-xl border border-gold/20 shadow-card p-6">
         <StudentAttendanceView
           studentId={profile.id}
           studentName={profile.full_name || `${profile.first_name} ${profile.last_name}`}

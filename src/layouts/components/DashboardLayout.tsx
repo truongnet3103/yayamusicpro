@@ -11,36 +11,40 @@ export function DashboardLayout() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-cream">
+        <div className="text-center">
+          <div className="text-5xl text-primary/30 mb-4 font-display">♫</div>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto"></div>
+        </div>
       </div>
     );
   }
 
   if (!profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-cream">
         <div className="text-center">
-          <p className="text-gray-600">Unable to load user profile</p>
+          <p className="text-charcoal/60 font-body">Không thể tải thông tin người dùng</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="flex">
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+    <div className="flex h-screen bg-cream overflow-hidden">
+      {/* Sidebar — handles both mobile (fixed/translate) and desktop (static) */}
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-        <div className="flex-1 flex flex-col min-w-0">
-          <Header onMenuClick={() => setSidebarOpen(true)} />
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+        <Header onMenuClick={() => setSidebarOpen(true)} />
 
-          <main className="flex-1 py-6 px-4 sm:px-6 lg:px-8">
-            <Outlet />
-          </main>
-        </div>
+        <main className="flex-1 overflow-y-auto bg-cream p-6 pb-20 lg:pb-6">
+          <Outlet />
+        </main>
       </div>
 
+      {/* Mobile bottom nav */}
       <MobileNav />
     </div>
   );

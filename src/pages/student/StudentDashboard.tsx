@@ -1,8 +1,8 @@
 /**
  * Student Dashboard
- * 
+ *
  * Role: Student
- * 
+ *
  * TODO: Backend must validate:
  * - User has 'attendance:view' capability (only for their own attendance)
  * - Assignments visible only for enrolled classes
@@ -57,90 +57,90 @@ function StudentDashboardContent() {
   return (
     <div className="space-y-6 pb-20 lg:pb-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Student Dashboard</h1>
-        <p className="text-gray-600">Welcome back, {profile?.first_name}!</p>
+        <h1 className="font-display text-2xl font-bold text-navy">Tổng Quan Học Viên</h1>
+        <p className="font-body text-charcoal/70">Chào mừng trở lại, {profile?.first_name}!</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="flex flex-col gap-2">
-            <div className="p-2 bg-blue-100 rounded-lg w-fit">
-              <CheckSquare className="w-5 h-5 text-blue-600" />
+        <div className="bg-white rounded-xl border border-gold/20 shadow-card p-4">
+          <div className="flex flex-col gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg w-fit">
+              <CheckSquare className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-xs text-gray-600">Attendance</p>
-              <p className="text-xl font-bold text-gray-900">
+              <p className="font-body text-xs text-charcoal/60">Tỉ lệ điểm danh</p>
+              <p className="font-display text-xl font-bold text-navy">
                 {attendanceStatus.rate > 0 ? `${attendanceStatus.rate}%` : '-'}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="flex flex-col gap-2">
-            <div className="p-2 bg-green-100 rounded-lg w-fit">
-              <Award className="w-5 h-5 text-green-600" />
+        <div className="bg-white rounded-xl border border-gold/20 shadow-card p-4">
+          <div className="flex flex-col gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg w-fit">
+              <Award className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-xs text-gray-600">Avg Grade</p>
-              <p className="text-xl font-bold text-gray-900">-</p>
+              <p className="font-body text-xs text-charcoal/60">Điểm trung bình</p>
+              <p className="font-display text-xl font-bold text-navy">-</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="flex flex-col gap-2">
-            <div className="p-2 bg-purple-100 rounded-lg w-fit">
-              <FileText className="w-5 h-5 text-purple-600" />
+        <div className="bg-white rounded-xl border border-gold/20 shadow-card p-4">
+          <div className="flex flex-col gap-3">
+            <div className="p-2 bg-gold/10 rounded-lg w-fit">
+              <FileText className="w-5 h-5 text-gold-dark" />
             </div>
             <div>
-              <p className="text-xs text-gray-600">Assignments</p>
-              <p className="text-xl font-bold text-gray-900">{assignmentsDue.length}</p>
+              <p className="font-body text-xs text-charcoal/60">Bài tập cần nộp</p>
+              <p className="font-display text-xl font-bold text-navy">{assignmentsDue.length}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="flex flex-col gap-2">
-            <div className="p-2 bg-orange-100 rounded-lg w-fit">
-              <TrendingUp className="w-5 h-5 text-orange-600" />
+        <div className="bg-white rounded-xl border border-gold/20 shadow-card p-4">
+          <div className="flex flex-col gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg w-fit">
+              <TrendingUp className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-xs text-gray-600">Level {progress.level}</p>
-              <p className="text-xl font-bold text-gray-900">{progress.points} pts</p>
+              <p className="font-body text-xs text-charcoal/60">Cấp độ {progress.level}</p>
+              <p className="font-display text-xl font-bold text-navy">{progress.points} điểm</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Today's Schedule */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Today's Schedule</h2>
+      <div className="bg-white rounded-xl border border-gold/20 shadow-card p-6">
+        <h2 className="font-display text-lg font-semibold text-navy mb-4">Lịch Học Hôm Nay</h2>
         {todaySchedule.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-            <p>No classes scheduled for today</p>
+          <div className="text-center py-12">
+            <Calendar className="w-12 h-12 mx-auto mb-3 text-charcoal/20" />
+            <p className="font-body text-charcoal/50">Hôm nay không có lịch học</p>
           </div>
         ) : (
           <div className="space-y-3">
             {todaySchedule.map((cls) => (
               <div
                 key={cls.id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-lg gap-3"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-cream-dark rounded-xl border border-gold/10 gap-3"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Calendar className="w-5 h-5 text-blue-600" />
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Calendar className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-gray-900">{cls.name}</h3>
-                    <p className="text-sm text-gray-600">
+                    <h3 className="font-body font-medium text-navy">{cls.name}</h3>
+                    <p className="font-body text-sm text-charcoal/60">
                       {cls.teacher} • {cls.room}
                     </p>
                   </div>
                 </div>
-                <span className="text-sm font-medium text-gray-700">{cls.time}</span>
+                <span className="font-body text-sm font-medium text-charcoal/70">{cls.time}</span>
               </div>
             ))}
           </div>
@@ -149,14 +149,14 @@ function StudentDashboardContent() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Assignments Due */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-xl border border-gold/20 shadow-card p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Assignments Due</h2>
+            <h2 className="font-display text-lg font-semibold text-navy">Bài Tập Cần Nộp</h2>
             <Link
               to="/student/assignments"
-              className="text-sm text-blue-600 hover:text-blue-700"
+              className="font-body text-sm text-primary hover:text-primary-light transition-colors"
             >
-              View All
+              Xem tất cả
             </Link>
           </div>
           <div className="space-y-3">
@@ -165,83 +165,83 @@ function StudentDashboardContent() {
                 <Link
                   key={assignment.id}
                   to={`/student/assignments/${assignment.id}`}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="flex items-center justify-between p-3 bg-cream-dark rounded-xl border border-gold/10 hover:bg-primary/5 transition-colors"
                 >
                   <div>
-                    <h3 className="text-sm font-medium text-gray-900">{assignment.name}</h3>
-                    <p className="text-xs text-gray-600">{assignment.subject}</p>
+                    <h3 className="font-body text-sm font-medium text-navy">{assignment.name}</h3>
+                    <p className="font-body text-xs text-charcoal/50">{assignment.subject}</p>
                   </div>
-                  <span className="text-xs font-medium text-orange-600">{assignment.due}</span>
+                  <span className="font-body text-xs font-medium text-gold-dark">{assignment.due}</span>
                 </Link>
               ))
             ) : (
-              <p className="text-sm text-gray-500 text-center py-4">No assignments due</p>
+              <p className="font-body text-sm text-charcoal/50 text-center py-4">Chưa có bài tập nào</p>
             )}
           </div>
         </div>
 
         {/* Recent Notifications */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-xl border border-gold/20 shadow-card p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Recent Notifications</h2>
+            <h2 className="font-display text-lg font-semibold text-navy">Thông Báo Gần Đây</h2>
             <Link
               to="/student/notifications"
-              className="text-sm text-blue-600 hover:text-blue-700"
+              className="font-body text-sm text-primary hover:text-primary-light transition-colors"
             >
-              View All
+              Xem tất cả
             </Link>
           </div>
           <div className="space-y-3">
             {recentNotifications.length > 0 ? (
               recentNotifications.map((notification) => (
-                <div key={notification.id} className="flex items-start gap-3">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
+                <div key={notification.id} className="flex items-start gap-3 pb-3 border-b border-gold/10 last:border-0">
+                  <div className="w-2 h-2 bg-primary rounded-full mt-1.5 flex-shrink-0"></div>
                   <div>
-                    <p className="text-sm text-gray-900">{notification.title}</p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(notification.timestamp).toLocaleString()}
+                    <p className="font-body text-sm text-navy">{notification.title}</p>
+                    <p className="font-body text-xs text-charcoal/50">
+                      {new Date(notification.timestamp).toLocaleString('vi-VN')}
                     </p>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-gray-500 text-center py-4">No notifications</p>
+              <p className="font-body text-sm text-charcoal/50 text-center py-4">Không có thông báo</p>
             )}
           </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+      <div className="bg-white rounded-xl border border-gold/20 shadow-card p-6">
+        <h2 className="font-display text-lg font-semibold text-navy mb-4">Truy Cập Nhanh</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Link
             to="/student/attendance"
-            className="p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors text-center"
+            className="p-4 bg-cream-dark hover:bg-primary/5 rounded-xl border border-gold/20 transition-colors text-center"
           >
-            <CheckSquare className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-            <p className="text-sm font-medium text-gray-900">Attendance</p>
+            <CheckSquare className="w-6 h-6 text-primary mx-auto mb-2" />
+            <p className="font-body text-sm font-medium text-navy">Điểm Danh</p>
           </Link>
           <Link
             to="/student/assignments"
-            className="p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition-colors text-center"
+            className="p-4 bg-cream-dark hover:bg-primary/5 rounded-xl border border-gold/20 transition-colors text-center"
           >
-            <FileText className="w-6 h-6 text-purple-600 mx-auto mb-2" />
-            <p className="text-sm font-medium text-gray-900">Assignments</p>
+            <FileText className="w-6 h-6 text-primary mx-auto mb-2" />
+            <p className="font-body text-sm font-medium text-navy">Bài Tập</p>
           </Link>
           <Link
             to="/student/grades"
-            className="p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-colors text-center"
+            className="p-4 bg-cream-dark hover:bg-primary/5 rounded-xl border border-gold/20 transition-colors text-center"
           >
-            <Award className="w-6 h-6 text-green-600 mx-auto mb-2" />
-            <p className="text-sm font-medium text-gray-900">Grades</p>
+            <Award className="w-6 h-6 text-primary mx-auto mb-2" />
+            <p className="font-body text-sm font-medium text-navy">Kết Quả</p>
           </Link>
           <Link
             to="/student/profile"
-            className="p-4 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors text-center"
+            className="p-4 bg-cream-dark hover:bg-primary/5 rounded-xl border border-gold/20 transition-colors text-center"
           >
-            <Calendar className="w-6 h-6 text-gray-600 mx-auto mb-2" />
-            <p className="text-sm font-medium text-gray-900">Profile</p>
+            <Calendar className="w-6 h-6 text-primary mx-auto mb-2" />
+            <p className="font-body text-sm font-medium text-navy">Hồ Sơ</p>
           </Link>
         </div>
       </div>

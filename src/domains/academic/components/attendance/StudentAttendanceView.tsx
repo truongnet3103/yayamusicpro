@@ -1,216 +1,212 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { CheckCircle, XCircle, Clock, AlertCircle, Calendar, TrendingUp, User } from 'lucide-react';
-import type { AttendanceHistoryItem, AttendanceSummary } from '../../types/attendance';
-import { getStudentAttendance } from '../../services/attendanceService';
+import { supabase } from '../../../../shared/lib/supabase';
 
 interface StudentAttendanceViewProps {
-  studentId: string;
+  studentId: string;   // user_profiles.id (auth user id)
   studentName: string;
   viewMode: 'student' | 'parent';
 }
 
+interface AttendanceRow {
+  id: string;
+  attendance_date: string;
+  status: 'present' | 'absent' | 'late' | 'excused';
+  check_in_time: string | null;
+  notes: string | null;
+  class_name: string;
+}
+
 export function StudentAttendanceView({ studentId, studentName, viewMode }: StudentAttendanceViewProps) {
-  const [records, setRecords] = useState<AttendanceHistoryItem[]>([]);
-  const [summary, setSummary] = useState<AttendanceSummary | null>(null);
+  const [records, setRecords] = useState<AttendanceRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  useEffect(() => {
-    loadAttendance();
-  }, [studentId, startDate, endDate]);
+  const loadAttendance = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
-  async function loadAttendance() {
     try {
-      setLoading(true);
-      setError(null);
-      const data = await getStudentAttendance(studentId, startDate, endDate);
-      setRecords(data.data);
-      setSummary(data.summary);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load attendance');
+      // Resolve user_profiles.id → students.id
+      const { data: studentRow, error: sErr } = await supabase
+        .from('students')
+        .select('id')
+        .eq('user_id', studentId)
+        .single();
+
+      if (sErr || !studentRow) {
+        setRecords([]);
+        setLoading(false);
+        return;
+      }
+
+      let query = supabase
+        .from('attendance_records')
+        .select('id, attendance_date, status, check_in_time, notes, classes(name)')
+        .eq('student_id', studentRow.id)
+        .order('attendance_date', { ascending: false });
+
+      if (startDate) query = query.gte('attendance_date', startDate);
+      if (endDate) query = query.lte('attendance_date', endDate);
+
+      const { data, error: attErr } = await query;
+      if (attErr) throw attErr;
+
+      setRecords(
+        (data ?? []).map((r: any) => ({
+          id: r.id,
+          attendance_date: r.attendance_date,
+          status: r.status,
+          check_in_time: r.check_in_time ?? null,
+          notes: r.notes ?? null,
+          class_name: r.classes?.name ?? '—',
+        }))
+      );
+    } catch (err: any) {
+      setError(err?.message ?? 'Không thể tải dữ liệu điểm danh');
     } finally {
       setLoading(false);
     }
-  }
+  }, [studentId, startDate, endDate]);
+
+  useEffect(() => { loadAttendance(); }, [loadAttendance]);
 
   const statusConfig = {
-    present: { icon: CheckCircle, label: 'Present', color: 'text-green-600', bg: 'bg-green-100' },
-    absent: { icon: XCircle, label: 'Absent', color: 'text-red-600', bg: 'bg-red-100' },
-    late: { icon: Clock, label: 'Late', color: 'text-yellow-600', bg: 'bg-yellow-100' },
-    excused: { icon: AlertCircle, label: 'Excused', color: 'text-blue-600', bg: 'bg-blue-100' },
+    present:  { icon: CheckCircle, label: 'Có mặt',   color: 'text-green-600',  bg: 'bg-green-100'  },
+    absent:   { icon: XCircle,     label: 'Vắng mặt', color: 'text-red-600',    bg: 'bg-red-100'    },
+    late:     { icon: Clock,       label: 'Đi trễ',   color: 'text-yellow-600', bg: 'bg-yellow-100' },
+    excused:  { icon: AlertCircle, label: 'Có phép',  color: 'text-blue-600',   bg: 'bg-blue-100'   },
   };
 
-  const attendanceRate = summary
+  const summary = records.reduce(
+    (acc, r) => { acc[r.status] = (acc[r.status] || 0) + 1; acc.total++; return acc; },
+    { present: 0, absent: 0, late: 0, excused: 0, total: 0 }
+  );
+  const attendanceRate = summary.total > 0
     ? Math.round(((summary.present + summary.late) / summary.total) * 100)
     : 0;
 
-  function getRateColor(rate: number) {
-    if (rate >= 90) return 'text-green-600';
-    if (rate >= 75) return 'text-yellow-600';
-    return 'text-red-600';
-  }
+  const getRateColor = (rate: number) =>
+    rate >= 90 ? 'text-green-600' : rate >= 75 ? 'text-yellow-600' : 'text-red-600';
 
-  function formatDate(dateString: string) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
-  }
+  const formatDate = (d: string) =>
+    new Date(d).toLocaleDateString('vi-VN', { day: 'numeric', month: 'short', year: 'numeric' });
 
-  function formatTime(timeString?: string) {
-    if (!timeString) return '-';
-    return new Date(`2000-01-01T${timeString}`).toLocaleTimeString('en-PH', {
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  }
+  const formatTime = (t: string | null) => {
+    if (!t) return '';
+    return new Date(`2000-01-01T${t}`).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false });
+  };
+
+  const inputCls = 'w-full px-3 py-2 border border-gold/40 rounded-lg bg-white font-body text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors';
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="max-w-6xl mx-auto space-y-6">
+      <div className="bg-white rounded-xl shadow-card border border-gold/20 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">
-              {viewMode === 'parent' ? 'Child Attendance' : 'My Attendance'}
-            </h1>
+            <h2 className="text-xl font-semibold text-navy font-display">
+              {viewMode === 'parent' ? 'Điểm Danh Của Con' : 'Điểm Danh Của Tôi'}
+            </h2>
             <div className="flex items-center gap-2 mt-1">
-              <User className="w-4 h-4 text-gray-400" />
-              <p className="text-gray-600">{studentName}</p>
+              <User className="w-4 h-4 text-charcoal/40" />
+              <p className="text-charcoal/60 font-body text-sm">{studentName}</p>
             </div>
           </div>
         </div>
 
         {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
             <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <p className="text-red-800">{error}</p>
+            <p className="text-red-800 font-body text-sm">{error}</p>
           </div>
         )}
 
+        {/* Date filters */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            <label className="block text-xs font-medium text-charcoal/70 font-body mb-1.5">Từ ngày</label>
+            <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className={inputCls} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            <label className="block text-xs font-medium text-charcoal/70 font-body mb-1.5">Đến ngày</label>
+            <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className={inputCls} />
           </div>
         </div>
 
-        {summary && (
+        {/* Summary stats */}
+        {records.length > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+            <div className="bg-primary/5 rounded-xl p-4 border border-primary/20">
               <div className="flex items-center gap-2 mb-1">
-                <TrendingUp className="w-4 h-4 text-blue-600" />
-                <span className="text-sm text-blue-700">Attendance Rate</span>
+                <TrendingUp className="w-4 h-4 text-primary" />
+                <span className="text-xs text-primary font-body">Tỷ lệ</span>
               </div>
-              <p className={`text-2xl font-semibold ${getRateColor(attendanceRate)}`}>
-                {attendanceRate}%
-              </p>
+              <p className={`text-2xl font-bold font-display ${getRateColor(attendanceRate)}`}>{attendanceRate}%</p>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div className="bg-cream rounded-xl p-4 border border-gold/20">
               <div className="flex items-center gap-2 mb-1">
-                <Calendar className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-600">Total Days</span>
+                <Calendar className="w-4 h-4 text-charcoal/50" />
+                <span className="text-xs text-charcoal/60 font-body">Tổng buổi</span>
               </div>
-              <p className="text-2xl font-semibold text-gray-900">{summary.total}</p>
+              <p className="text-2xl font-bold text-navy font-display">{summary.total}</p>
             </div>
-            <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-              <div className="flex items-center gap-2 mb-1">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span className="text-sm text-green-700">Present</span>
-              </div>
-              <p className="text-2xl font-semibold text-green-700">{summary.present}</p>
-            </div>
-            <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-              <div className="flex items-center gap-2 mb-1">
-                <XCircle className="w-4 h-4 text-red-600" />
-                <span className="text-sm text-red-700">Absent</span>
-              </div>
-              <p className="text-2xl font-semibold text-red-700">{summary.absent}</p>
-            </div>
-            <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
-              <div className="flex items-center gap-2 mb-1">
-                <Clock className="w-4 h-4 text-yellow-600" />
-                <span className="text-sm text-yellow-700">Late</span>
-              </div>
-              <p className="text-2xl font-semibold text-yellow-700">{summary.late}</p>
-            </div>
-            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-              <div className="flex items-center gap-2 mb-1">
-                <AlertCircle className="w-4 h-4 text-blue-600" />
-                <span className="text-sm text-blue-700">Excused</span>
-              </div>
-              <p className="text-2xl font-semibold text-blue-700">{summary.excused}</p>
-            </div>
+            {(['present','absent','late','excused'] as const).map(st => {
+              const cfg = statusConfig[st];
+              const Icon = cfg.icon;
+              return (
+                <div key={st} className={`${cfg.bg} rounded-xl p-4 border border-${st === 'present' ? 'green' : st === 'absent' ? 'red' : st === 'late' ? 'yellow' : 'blue'}-200`}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Icon className={`w-4 h-4 ${cfg.color}`} />
+                    <span className={`text-xs font-body ${cfg.color}`}>{cfg.label}</span>
+                  </div>
+                  <p className={`text-2xl font-bold font-display ${cfg.color}`}>{summary[st]}</p>
+                </div>
+              );
+            })}
           </div>
         )}
 
+        {/* Records list */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+          </div>
+        ) : records.length === 0 ? (
+          <div className="text-center py-12">
+            <Calendar className="w-12 h-12 mx-auto mb-3 text-gold/30" />
+            <p className="text-charcoal/50 font-body text-sm">Chưa có dữ liệu điểm danh</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">Attendance History</h2>
-            {records.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
-                <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                <p>No attendance records found</p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {records.map((record) => {
-                  const config = statusConfig[record.status];
-                  const Icon = config.icon;
-
-                  return (
-                    <div
-                      key={record.id}
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className={`p-3 rounded-full ${config.bg}`}>
-                          <Icon className={`w-5 h-5 ${config.color}`} />
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900">{record.classes.name}</p>
-                          <p className="text-sm text-gray-500">{record.classes.code}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-6">
-                        <div className="text-right">
-                          <p className="text-sm font-medium text-gray-900">
-                            {formatDate(record.attendance_date)}
-                          </p>
-                          {record.check_in_time && (
-                            <p className="text-xs text-gray-500">
-                              Check-in: {formatTime(record.check_in_time)}
-                            </p>
-                          )}
-                        </div>
-                        <div className={`px-4 py-2 rounded-full ${config.bg} flex items-center gap-2`}>
-                          <Icon className={`w-4 h-4 ${config.color}`} />
-                          <span className={`font-medium ${config.color}`}>{config.label}</span>
-                        </div>
-                      </div>
+          <div className="space-y-2">
+            <h3 className="text-base font-semibold text-navy font-display mb-3">Lịch Sử Điểm Danh</h3>
+            {records.map(record => {
+              const cfg = statusConfig[record.status];
+              const Icon = cfg.icon;
+              return (
+                <div key={record.id} className="flex items-center justify-between p-4 bg-cream rounded-xl border border-gold/20">
+                  <div className="flex items-center gap-4">
+                    <div className={`p-3 rounded-full ${cfg.bg}`}>
+                      <Icon className={`w-5 h-5 ${cfg.color}`} />
                     </div>
-                  );
-                })}
-              </div>
-            )}
+                    <div>
+                      <p className="font-semibold text-navy font-body">{record.class_name}</p>
+                      <p className="text-xs text-charcoal/50 font-body">{formatDate(record.attendance_date)}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    {record.check_in_time && (
+                      <span className="text-xs text-charcoal/40 font-body">Vào: {formatTime(record.check_in_time)}</span>
+                    )}
+                    <div className={`px-3 py-1.5 rounded-full ${cfg.bg} flex items-center gap-1.5`}>
+                      <Icon className={`w-4 h-4 ${cfg.color}`} />
+                      <span className={`font-semibold font-body text-sm ${cfg.color}`}>{cfg.label}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

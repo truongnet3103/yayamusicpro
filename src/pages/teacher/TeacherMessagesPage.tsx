@@ -1,11 +1,11 @@
 /**
  * Teacher Messages Page
- * 
+ *
  * Communication with students and parents
  * School-scoped and respects multi-tenancy
  */
 
-import { MessageSquare, Send, Inbox, Search, Users, Mail, Phone } from 'lucide-react';
+import { MessageSquare, Send, Search, Users, Mail, Phone } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useUser } from '../../domains/auth/contexts/UserContext';
 import { useTenant } from '../../shared/contexts/TenantContext';
@@ -40,7 +40,7 @@ function TeacherMessagesPageContent() {
     const loadContacts = async () => {
       try {
         setLoading(true);
-        
+
         // Load students from teacher's classes
         const { data: classes } = await supabase
           .from('classes')
@@ -142,10 +142,17 @@ function TeacherMessagesPageContent() {
     contact.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const roleLabel = (role: MessageContact['role']) => {
+    if (role === 'student') return 'Học viên';
+    if (role === 'parent') return 'Phụ huynh';
+    if (role === 'teacher') return 'Giảng viên';
+    return 'Quản trị';
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -153,23 +160,23 @@ function TeacherMessagesPageContent() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
-        <p className="text-gray-600">Communicate with students and parents</p>
+        <h1 className="text-2xl font-bold text-navy font-display">Tin Nhắn</h1>
+        <p className="text-charcoal/60 font-body text-sm mt-1">Liên lạc với học viên và phụ huynh</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
         {/* Contacts List */}
-        <div className="lg:col-span-1 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col">
+        <div className="lg:col-span-1 bg-white rounded-xl shadow-card border border-gold/20 flex flex-col">
           {/* Search */}
-          <div className="p-4 border-b border-gray-200">
+          <div className="p-4 border-b border-gold/20">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-charcoal/40" />
               <input
                 type="text"
-                placeholder="Search contacts..."
+                placeholder="Tìm kiếm liên hệ..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-9 pr-4 py-2 border border-gold/40 rounded-lg bg-white font-body text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
               />
             </div>
           </div>
@@ -177,43 +184,45 @@ function TeacherMessagesPageContent() {
           {/* Contacts */}
           <div className="flex-1 overflow-y-auto">
             {filteredContacts.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
-                <Users className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p className="text-sm">
-                  {searchQuery ? 'No contacts found' : 'No contacts available'}
+              <div className="p-8 text-center">
+                <Users className="w-12 h-12 mx-auto mb-3 text-gold/30" />
+                <p className="text-sm text-charcoal/50 font-body">
+                  {searchQuery ? 'Không tìm thấy liên hệ' : 'Chưa có liên hệ nào'}
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-gray-200">
+              <div className="divide-y divide-gold/10">
                 {filteredContacts.map((contact) => (
                   <button
                     key={contact.id}
                     onClick={() => setSelectedContact(contact)}
-                    className={`w-full p-4 text-left hover:bg-gray-50 transition-colors ${
-                      selectedContact?.id === contact.id ? 'bg-blue-50 border-l-4 border-l-blue-600' : ''
+                    className={`w-full p-4 text-left hover:bg-cream/60 transition-colors ${
+                      selectedContact?.id === contact.id
+                        ? 'bg-primary/5 border-l-2 border-l-primary'
+                        : ''
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        contact.role === 'student' ? 'bg-blue-100' :
-                        contact.role === 'parent' ? 'bg-green-100' :
-                        'bg-gray-100'
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        contact.role === 'student' ? 'bg-primary/10' :
+                        contact.role === 'parent' ? 'bg-gold/20' :
+                        'bg-navy/10'
                       }`}>
                         <Users className={`w-5 h-5 ${
-                          contact.role === 'student' ? 'text-blue-600' :
-                          contact.role === 'parent' ? 'text-green-600' :
-                          'text-gray-600'
+                          contact.role === 'student' ? 'text-primary' :
+                          contact.role === 'parent' ? 'text-gold' :
+                          'text-navy'
                         }`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{contact.name}</p>
-                        <p className="text-xs text-gray-500 capitalize">{contact.role}</p>
+                        <p className="text-sm font-semibold text-navy font-body truncate">{contact.name}</p>
+                        <p className="text-xs text-charcoal/50 font-body">{roleLabel(contact.role)}</p>
                         {contact.email && (
-                          <p className="text-xs text-gray-500 truncate">{contact.email}</p>
+                          <p className="text-xs text-charcoal/40 font-body truncate">{contact.email}</p>
                         )}
                       </div>
                       {contact.unread_count && contact.unread_count > 0 && (
-                        <span className="bg-blue-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                        <span className="bg-primary text-white text-xs font-bold font-body rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
                           {contact.unread_count}
                         </span>
                       )}
@@ -226,40 +235,38 @@ function TeacherMessagesPageContent() {
         </div>
 
         {/* Message View */}
-        <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col">
+        <div className="lg:col-span-2 bg-white rounded-xl shadow-card border border-gold/20 flex flex-col">
           {selectedContact ? (
             <>
               {/* Message Header */}
-              <div className="p-4 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      selectedContact.role === 'student' ? 'bg-blue-100' :
-                      selectedContact.role === 'parent' ? 'bg-green-100' :
-                      'bg-gray-100'
-                    }`}>
-                      <Users className={`w-5 h-5 ${
-                        selectedContact.role === 'student' ? 'text-blue-600' :
-                        selectedContact.role === 'parent' ? 'text-green-600' :
-                        'text-gray-600'
-                      }`} />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{selectedContact.name}</h3>
-                      <div className="flex items-center gap-4 mt-1">
-                        {selectedContact.email && (
-                          <div className="flex items-center gap-1 text-sm text-gray-600">
-                            <Mail className="w-4 h-4" />
-                            <span>{selectedContact.email}</span>
-                          </div>
-                        )}
-                        {selectedContact.phone && (
-                          <div className="flex items-center gap-1 text-sm text-gray-600">
-                            <Phone className="w-4 h-4" />
-                            <span>{selectedContact.phone}</span>
-                          </div>
-                        )}
-                      </div>
+              <div className="p-4 border-b border-gold/20">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    selectedContact.role === 'student' ? 'bg-primary/10' :
+                    selectedContact.role === 'parent' ? 'bg-gold/20' :
+                    'bg-navy/10'
+                  }`}>
+                    <Users className={`w-5 h-5 ${
+                      selectedContact.role === 'student' ? 'text-primary' :
+                      selectedContact.role === 'parent' ? 'text-gold' :
+                      'text-navy'
+                    }`} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-semibold text-navy font-body">{selectedContact.name}</h3>
+                    <div className="flex items-center gap-4 mt-0.5">
+                      {selectedContact.email && (
+                        <div className="flex items-center gap-1 text-xs text-charcoal/50 font-body">
+                          <Mail className="w-3.5 h-3.5" />
+                          <span>{selectedContact.email}</span>
+                        </div>
+                      )}
+                      {selectedContact.phone && (
+                        <div className="flex items-center gap-1 text-xs text-charcoal/50 font-body">
+                          <Phone className="w-3.5 h-3.5" />
+                          <span>{selectedContact.phone}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -267,33 +274,45 @@ function TeacherMessagesPageContent() {
 
               {/* Messages Area */}
               <div className="flex-1 overflow-y-auto p-6">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-8 text-center">
-                  <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Messaging Coming Soon</h3>
-                  <p className="text-gray-600 mb-4">
-                    The messaging interface is under development. You'll be able to:
+                <div className="bg-cream rounded-xl border border-gold/20 p-8 text-center">
+                  <MessageSquare className="w-16 h-16 text-gold/30 mx-auto mb-4" />
+                  <h3 className="text-base font-semibold text-navy font-display mb-2">Tính năng đang phát triển</h3>
+                  <p className="text-charcoal/60 font-body text-sm mb-4">
+                    Giao diện nhắn tin đang được xây dựng. Bạn sẽ có thể:
                   </p>
-                  <ul className="text-left max-w-md mx-auto text-gray-600 space-y-2">
-                    <li>• Send messages to students and parents</li>
-                    <li>• Receive and reply to messages</li>
-                    <li>• View message history</li>
-                    <li>• Get read receipts</li>
+                  <ul className="text-left max-w-sm mx-auto space-y-2">
+                    <li className="flex items-center gap-2 text-sm text-charcoal/70 font-body">
+                      <span className="w-1.5 h-1.5 bg-gold rounded-full flex-shrink-0"></span>
+                      Gửi tin nhắn đến học viên và phụ huynh
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-charcoal/70 font-body">
+                      <span className="w-1.5 h-1.5 bg-gold rounded-full flex-shrink-0"></span>
+                      Nhận và trả lời tin nhắn
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-charcoal/70 font-body">
+                      <span className="w-1.5 h-1.5 bg-gold rounded-full flex-shrink-0"></span>
+                      Xem lịch sử tin nhắn
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-charcoal/70 font-body">
+                      <span className="w-1.5 h-1.5 bg-gold rounded-full flex-shrink-0"></span>
+                      Xác nhận đã đọc
+                    </li>
                   </ul>
                 </div>
               </div>
 
               {/* Message Input */}
-              <div className="p-4 border-t border-gray-200">
+              <div className="p-4 border-t border-gold/20">
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
-                    placeholder="Type a message..."
+                    placeholder="Nhập tin nhắn..."
                     disabled
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+                    className="flex-1 px-4 py-2 border border-gold/30 rounded-lg bg-cream font-body text-sm text-charcoal/50 cursor-not-allowed"
                   />
                   <button
                     disabled
-                    className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-2 bg-primary text-white rounded-lg hover:bg-primary-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Send className="w-5 h-5" />
                   </button>
@@ -303,9 +322,11 @@ function TeacherMessagesPageContent() {
           ) : (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
-                <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Select a Contact</h3>
-                <p className="text-gray-600">Choose a student or parent from the list to start messaging</p>
+                <MessageSquare className="w-16 h-16 text-gold/30 mx-auto mb-4" />
+                <h3 className="text-base font-semibold text-navy font-display mb-2">Chọn Liên Hệ</h3>
+                <p className="text-charcoal/60 font-body text-sm">
+                  Chọn học viên hoặc phụ huynh từ danh sách để bắt đầu nhắn tin
+                </p>
               </div>
             </div>
           )}

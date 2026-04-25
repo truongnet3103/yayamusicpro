@@ -1,4 +1,4 @@
-import { Menu, Search, LogOut, User, Settings } from 'lucide-react';
+import { Menu, LogOut, User, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { NotificationBell } from '../../domains/communication/components/notifications/NotificationBell';
@@ -18,61 +18,50 @@ export function Header({ onMenuClick }: HeaderProps) {
   const handleSignOut = async (e?: React.MouseEvent) => {
     e?.preventDefault();
     e?.stopPropagation();
-    
-    setShowUserMenu(false); // Close menu immediately
-    
-    // Try to sign out from Supabase, but don't block on errors
+
+    setShowUserMenu(false);
+
     try {
       await signOut();
     } catch (error) {
-      // Supabase signOut might fail if session is already invalid/expired
-      // That's okay - we'll still clear everything with hard redirect
       console.warn('Supabase signOut failed (session may already be invalid):', error);
     }
-    
-    // Use hard redirect to ensure everything is cleared
-    // This forces a full page reload, clearing all React state
+
     window.location.href = '/login';
   };
 
   return (
-    <header className="sticky top-0 z-10 bg-white border-b border-gray-200">
-      <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-4 flex-1">
+    <header className="bg-white border-b border-gold/20 shadow-sm sticky top-0 z-40">
+      <div className="flex items-center justify-between h-16 px-4 sm:px-6">
+        {/* Left */}
+        <div className="flex items-center gap-3">
           <button
             onClick={onMenuClick}
-            className="lg:hidden text-gray-500 hover:text-gray-700"
+            className="lg:hidden text-charcoal/60 hover:text-primary transition-colors p-1"
           >
             <Menu className="w-6 h-6" />
           </button>
-
-          <div className="hidden sm:flex items-center flex-1 max-w-lg">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
+          <div className="hidden sm:block">
+            <span className="font-display text-navy text-sm opacity-60 select-none">♩</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        {/* Right */}
+        <div className="flex items-center gap-3">
           <NotificationBell />
 
           <div className="relative">
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
-              className="flex items-center gap-3 hover:bg-gray-100 rounded-lg px-3 py-2 transition-colors"
+              className="flex items-center gap-2.5 hover:bg-cream rounded-lg px-2.5 py-1.5 transition-colors"
             >
-              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                <span className="text-blue-600 font-semibold text-sm">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <span className="text-primary font-semibold text-sm font-body">
                   {profile?.first_name?.[0]}
                   {profile?.last_name?.[0]}
                 </span>
               </div>
-              <span className="hidden md:block text-sm font-medium text-gray-700">
+              <span className="hidden md:block text-sm font-medium text-charcoal font-body">
                 {profile?.full_name}
               </span>
             </button>
@@ -86,12 +75,12 @@ export function Header({ onMenuClick }: HeaderProps) {
                     setShowUserMenu(false);
                   }}
                 />
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
-                  <div className="px-4 py-3 border-b border-gray-200">
-                    <p className="text-sm font-medium text-gray-900">
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-elegant border border-gold/20 py-2 z-20">
+                  <div className="px-4 py-3 border-b border-gold/20">
+                    <p className="text-sm font-semibold text-navy font-body">
                       {profile?.full_name}
                     </p>
-                    <p className="text-xs text-gray-500">{profile?.email}</p>
+                    <p className="text-xs text-charcoal/60 font-body mt-0.5">{profile?.email}</p>
                   </div>
 
                   <button
@@ -99,15 +88,14 @@ export function Header({ onMenuClick }: HeaderProps) {
                       navigate('/profile');
                       setShowUserMenu(false);
                     }}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-charcoal hover:bg-cream font-body transition-colors"
                   >
-                    <User className="w-4 h-4" />
-                    <span>Profile</span>
+                    <User className="w-4 h-4 text-charcoal/50" />
+                    <span>Hồ sơ</span>
                   </button>
 
                   <button
                     onClick={() => {
-                      // Navigate to role-specific settings
                       const role = profile?.user_type;
                       if (role === 'teacher') {
                         navigate('/teacher/settings');
@@ -118,21 +106,21 @@ export function Header({ onMenuClick }: HeaderProps) {
                       }
                       setShowUserMenu(false);
                     }}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-charcoal hover:bg-cream font-body transition-colors"
                   >
-                    <Settings className="w-4 h-4" />
-                    <span>Settings</span>
+                    <Settings className="w-4 h-4 text-charcoal/50" />
+                    <span>Cài đặt</span>
                   </button>
 
-                  <hr className="my-2 border-gray-200" />
+                  <hr className="my-2 border-gold/20" />
 
                   <button
                     onClick={(e) => handleSignOut(e)}
                     type="button"
-                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 font-body transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
-                    <span>Sign Out</span>
+                    <span>Đăng xuất</span>
                   </button>
                 </div>
               </>

@@ -1,6 +1,6 @@
 /**
  * Parent Messages Page
- * 
+ *
  * Communication with school, teachers, and staff
  * School-scoped and respects multi-tenancy
  */
@@ -152,7 +152,7 @@ function ParentMessagesPageContent() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -160,23 +160,23 @@ function ParentMessagesPageContent() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
-        <p className="text-gray-600">Communicate with your children's teachers</p>
+        <h1 className="font-display text-2xl font-bold text-navy">Tin Nhắn</h1>
+        <p className="font-body text-charcoal/70">Liên lạc với giảng viên của con em</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
         {/* Contacts List */}
-        <div className="lg:col-span-1 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col">
+        <div className="lg:col-span-1 bg-white rounded-xl border border-gold/20 shadow-card flex flex-col overflow-hidden">
           {/* Search */}
-          <div className="p-4 border-b border-gray-200">
+          <div className="p-4 border-b border-gold/20">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-charcoal/40" />
               <input
                 type="text"
-                placeholder="Search teachers..."
+                placeholder="Tìm giảng viên..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-9 pr-4 py-2 border border-gold/40 rounded-lg bg-white focus:ring-2 focus:ring-primary/30 focus:border-primary font-body text-sm transition-colors"
               />
             </div>
           </div>
@@ -184,40 +184,44 @@ function ParentMessagesPageContent() {
           {/* Contacts */}
           <div className="flex-1 overflow-y-auto">
             {filteredContacts.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
-                <Users className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p className="text-sm">
-                  {searchQuery ? 'No teachers found' : contacts.length === 0 
-                    ? 'No teachers available. Your children may not be enrolled in classes yet.' 
-                    : 'No contacts found'}
+              <div className="p-8 text-center">
+                <Users className="w-12 h-12 mx-auto mb-3 text-charcoal/20" />
+                <p className="font-body text-sm text-charcoal/50">
+                  {searchQuery
+                    ? 'Không tìm thấy giảng viên'
+                    : contacts.length === 0
+                    ? 'Chưa có giảng viên. Con em chưa được đăng ký lớp học.'
+                    : 'Không tìm thấy liên hệ'}
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-gray-200">
+              <div className="divide-y divide-gold/10">
                 {filteredContacts.map((contact) => (
                   <button
                     key={contact.id}
                     onClick={() => setSelectedContact(contact)}
-                    className={`w-full p-4 text-left hover:bg-gray-50 transition-colors ${
-                      selectedContact?.id === contact.id ? 'bg-blue-50 border-l-4 border-l-blue-600' : ''
+                    className={`w-full p-4 text-left transition-colors ${
+                      selectedContact?.id === contact.id
+                        ? 'bg-primary/5 border-l-4 border-l-primary'
+                        : 'hover:bg-cream-dark border-l-4 border-l-transparent'
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <BookOpen className="w-5 h-5 text-blue-600" />
+                      <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                        <BookOpen className="w-4 h-4 text-primary" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{contact.name}</p>
-                        <p className="text-xs text-gray-500 capitalize">Teacher</p>
+                        <p className="font-body text-sm font-medium text-navy truncate">{contact.name}</p>
+                        <p className="font-body text-xs text-charcoal/50">Giảng viên</p>
                         {contact.specialization && (
-                          <p className="text-xs text-gray-500 truncate">{contact.specialization}</p>
+                          <p className="font-body text-xs text-primary/70 truncate">{contact.specialization}</p>
                         )}
                         {contact.email && (
-                          <p className="text-xs text-gray-400 truncate">{contact.email}</p>
+                          <p className="font-body text-xs text-charcoal/40 truncate">{contact.email}</p>
                         )}
                       </div>
                       {contact.unread_count && contact.unread_count > 0 && (
-                        <span className="bg-blue-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                        <span className="bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
                           {contact.unread_count}
                         </span>
                       )}
@@ -230,35 +234,33 @@ function ParentMessagesPageContent() {
         </div>
 
         {/* Message View */}
-        <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col">
+        <div className="lg:col-span-2 bg-white rounded-xl border border-gold/20 shadow-card flex flex-col overflow-hidden">
           {selectedContact ? (
             <>
               {/* Message Header */}
-              <div className="p-4 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <BookOpen className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{selectedContact.name}</h3>
-                      <div className="flex items-center gap-4 mt-1">
-                        {selectedContact.specialization && (
-                          <span className="text-sm text-gray-600">{selectedContact.specialization}</span>
-                        )}
-                        {selectedContact.email && (
-                          <div className="flex items-center gap-1 text-sm text-gray-600">
-                            <Mail className="w-4 h-4" />
-                            <span>{selectedContact.email}</span>
-                          </div>
-                        )}
-                        {selectedContact.phone && (
-                          <div className="flex items-center gap-1 text-sm text-gray-600">
-                            <Phone className="w-4 h-4" />
-                            <span>{selectedContact.phone}</span>
-                          </div>
-                        )}
-                      </div>
+              <div className="p-4 border-b border-gold/20 bg-cream">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                    <BookOpen className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-display text-base font-semibold text-navy">{selectedContact.name}</h3>
+                    <div className="flex flex-wrap items-center gap-3 mt-0.5">
+                      {selectedContact.specialization && (
+                        <span className="font-body text-xs text-charcoal/60">{selectedContact.specialization}</span>
+                      )}
+                      {selectedContact.email && (
+                        <div className="flex items-center gap-1 font-body text-xs text-charcoal/60">
+                          <Mail className="w-3 h-3" />
+                          <span>{selectedContact.email}</span>
+                        </div>
+                      )}
+                      {selectedContact.phone && (
+                        <div className="flex items-center gap-1 font-body text-xs text-charcoal/60">
+                          <Phone className="w-3 h-3" />
+                          <span>{selectedContact.phone}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -266,45 +268,61 @@ function ParentMessagesPageContent() {
 
               {/* Messages Area */}
               <div className="flex-1 overflow-y-auto p-6">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-8 text-center">
-                  <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Messaging Coming Soon</h3>
-                  <p className="text-gray-600 mb-4">
-                    The messaging interface is under development. You'll be able to:
+                <div className="bg-cream rounded-xl border border-gold/20 p-8 text-center">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <MessageSquare className="w-8 h-8 text-primary/40" />
+                  </div>
+                  <h3 className="font-display text-lg font-semibold text-navy mb-2">Tính Năng Đang Phát Triển</h3>
+                  <p className="font-body text-charcoal/60 mb-4">
+                    Hệ thống nhắn tin đang được phát triển. Bạn sẽ sớm có thể:
                   </p>
-                  <ul className="text-left max-w-md mx-auto text-gray-600 space-y-2">
-                    <li>• Send messages to your children's teachers</li>
-                    <li>• Receive and reply to messages</li>
-                    <li>• View message history</li>
-                    <li>• Get read receipts</li>
+                  <ul className="text-left max-w-xs mx-auto font-body text-sm text-charcoal/60 space-y-2">
+                    <li className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-gold rounded-full flex-shrink-0"></span>
+                      Gửi tin nhắn cho giảng viên
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-gold rounded-full flex-shrink-0"></span>
+                      Nhận và phản hồi tin nhắn
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-gold rounded-full flex-shrink-0"></span>
+                      Xem lịch sử hội thoại
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-gold rounded-full flex-shrink-0"></span>
+                      Xác nhận đã đọc
+                    </li>
                   </ul>
                 </div>
               </div>
 
               {/* Message Input */}
-              <div className="p-4 border-t border-gray-200">
+              <div className="p-4 border-t border-gold/20">
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
-                    placeholder="Type a message..."
+                    placeholder="Nhập tin nhắn..."
                     disabled
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+                    className="flex-1 px-4 py-2.5 border border-gold/40 rounded-lg bg-cream-dark text-charcoal/40 font-body text-sm cursor-not-allowed"
                   />
                   <button
                     disabled
-                    className="px-4 py-2 bg-gray-200 text-gray-500 rounded-lg cursor-not-allowed flex items-center gap-2"
+                    className="px-4 py-2.5 bg-charcoal/10 text-charcoal/40 rounded-lg cursor-not-allowed flex items-center gap-2 font-body text-sm"
                   >
                     <Send className="w-4 h-4" />
-                    <span>Send</span>
+                    <span>Gửi</span>
                   </button>
                 </div>
               </div>
             </>
           ) : (
             <div className="flex-1 flex items-center justify-center">
-              <div className="text-center text-gray-500">
-                <Inbox className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p>Select a teacher to start messaging</p>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Inbox className="w-8 h-8 text-primary/40" />
+                </div>
+                <p className="font-body text-charcoal/50">Chọn một giảng viên để bắt đầu nhắn tin</p>
               </div>
             </div>
           )}

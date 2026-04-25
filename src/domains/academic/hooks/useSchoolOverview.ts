@@ -32,7 +32,7 @@ export function useSchoolOverview() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!school?.id) {
+    if (!school) {
       setLoading(false);
       return;
     }

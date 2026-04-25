@@ -39,12 +39,12 @@ export function NotificationBell() {
     <div className="relative">
       <button
         onClick={() => setShowDropdown(!showDropdown)}
-        className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
-        aria-label="Notifications"
+        className="relative p-2 rounded-lg text-charcoal/60 hover:text-primary hover:bg-cream transition-colors"
+        aria-label="Thông báo"
       >
-        <Bell className="w-6 h-6 text-gray-600" />
+        <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+          <span className="absolute top-1 right-1 bg-primary text-white text-xs font-bold font-body rounded-full w-4 h-4 flex items-center justify-center leading-none">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}

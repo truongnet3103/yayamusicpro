@@ -1,75 +1,75 @@
 /**
- * App-wide locale settings for Philippines
+ * App-wide locale settings for Vietnam
  */
 
 export const APP_LOCALE = {
-  country: 'Philippines',
-  countryCode: 'PH',
-  timezone: 'Asia/Manila',
-  currency: 'PHP',
-  currencySymbol: '₱',
-  dateFormat: 'MM/DD/YYYY',
-  timeFormat: '12h' as '12h' | '24h',
-  language: 'en',
-  phoneCode: '+63',
+  country: 'Vietnam',
+  countryCode: 'VN',
+  timezone: 'Asia/Ho_Chi_Minh',
+  currency: 'VND',
+  currencySymbol: '₫',
+  dateFormat: 'DD/MM/YYYY',
+  timeFormat: '24h' as '12h' | '24h',
+  language: 'vi',
+  phoneCode: '+84',
 };
 
-export const PHILIPPINES_TIMEZONES = [
-  { value: 'Asia/Manila', label: 'Manila (PHT)' },
+export const VIETNAM_TIMEZONES = [
+  { value: 'Asia/Ho_Chi_Minh', label: 'Hồ Chí Minh (ICT)' },
 ];
 
-export const PHILIPPINES_CITIES = [
-  'Manila',
-  'Quezon City',
-  'Caloocan',
-  'Davao City',
-  'Cebu City',
-  'Zamboanga City',
-  'Antipolo',
-  'Pasig',
-  'Cagayan de Oro',
-  'Valenzuela',
-  'Las Piñas',
-  'Makati',
-  'Bacolod',
-  'General Santos',
-  'Parañaque',
-  'Muntinlupa',
-  'San Jose del Monte',
-  'Las Piñas',
-  'Marikina',
-  'Mandaue',
+export const VIETNAM_CITIES = [
+  'Hà Nội',
+  'TP. Hồ Chí Minh',
+  'Đà Nẵng',
+  'Hải Phòng',
+  'Cần Thơ',
+  'Biên Hòa',
+  'Nha Trang',
+  'Huế',
+  'Buôn Ma Thuột',
+  'Quy Nhơn',
+  'Vũng Tàu',
+  'Nam Định',
+  'Thái Nguyên',
+  'Vinh',
+  'Đà Lạt',
+  'Hạ Long',
+  'Mỹ Tho',
+  'Bắc Ninh',
+  'Rạch Giá',
+  'Long Xuyên',
 ];
 
 export function formatCurrency(amount: number): string {
-  return `₱${amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
 }
 
 export function formatDate(date: Date | string, format: string = APP_LOCALE.dateFormat): string {
   const d = typeof date === 'string' ? new Date(date) : date;
-  
+
   const day = d.getDate().toString().padStart(2, '0');
   const month = (d.getMonth() + 1).toString().padStart(2, '0');
   const year = d.getFullYear();
-  
+
   switch (format) {
-    case 'MM/DD/YYYY':
-      return `${month}/${day}/${year}`;
     case 'DD/MM/YYYY':
       return `${day}/${month}/${year}`;
+    case 'MM/DD/YYYY':
+      return `${month}/${day}/${year}`;
     case 'YYYY-MM-DD':
       return `${year}-${month}-${day}`;
     default:
-      return `${month}/${day}/${year}`;
+      return `${day}/${month}/${year}`;
   }
 }
 
 export function formatTime(date: Date | string, format: '12h' | '24h' = APP_LOCALE.timeFormat): string {
   const d = typeof date === 'string' ? new Date(date) : date;
-  
+
   if (format === '24h') {
-    return d.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit', hour12: false });
+    return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false });
   } else {
-    return d.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit', hour12: true });
+    return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: true });
   }
 }

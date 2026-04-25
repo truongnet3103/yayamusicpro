@@ -8,13 +8,13 @@ interface SkeletonProps {
 
 export function Skeleton({ className = '' }: SkeletonProps) {
   return (
-    <div className={`animate-pulse bg-gray-200 rounded ${className}`} />
+    <div className={`animate-pulse bg-gold/20 rounded ${className}`} />
   );
 }
 
 export function CardSkeleton() {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="bg-white rounded-xl border border-gold/20 shadow-card p-6">
       <Skeleton className="h-4 w-24 mb-4" />
       <Skeleton className="h-8 w-32 mb-2" />
       <Skeleton className="h-4 w-16" />
@@ -24,7 +24,7 @@ export function CardSkeleton() {
 
 export function TableSkeleton({ rows = 5 }: { rows?: number }) {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="bg-white rounded-xl border border-gold/20 shadow-card p-6">
       <Skeleton className="h-6 w-32 mb-4" />
       <div className="space-y-3">
         {Array.from({ length: rows }).map((_, i) => (

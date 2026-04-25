@@ -50,90 +50,90 @@ function SchoolDashboardTab({ school }: { school: SchoolType | null }) {
   if (!school) {
     return (
       <div className="text-center py-12">
-        <School className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-        <p className="text-gray-600">No school information available</p>
+        <School className="w-16 h-16 text-gold/30 mx-auto mb-4" />
+        <p className="text-charcoal/60 font-body">Không có thông tin cơ sở</p>
       </div>
     );
   }
 
   const statCards = [
     {
-      label: 'Total Students',
+      label: 'Tổng học viên',
       value: stats.totalStudents,
       icon: Users,
-      color: 'bg-blue-500',
+      color: 'bg-primary',
     },
     {
-      label: 'Total Teachers',
+      label: 'Tổng giảng viên',
       value: stats.totalTeachers,
       icon: BookOpen,
-      color: 'bg-green-500',
+      color: 'bg-gold',
     },
     {
-      label: 'Active Classes',
+      label: 'Lớp đang hoạt động',
       value: stats.totalClasses,
       icon: Calendar,
-      color: 'bg-purple-500',
+      color: 'bg-navy',
     },
     {
-      label: 'Total Users',
+      label: 'Tổng người dùng',
       value: stats.totalUsers,
       icon: TrendingUp,
-      color: 'bg-orange-500',
+      color: 'bg-green-600',
     },
   ];
 
   return (
     <div className="space-y-6">
       {/* School Information */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-cream rounded-xl border border-gold/20 p-6">
         <div className="flex items-start gap-6">
           {school.logo_url ? (
-            <img src={school.logo_url} alt={school.name} className="w-24 h-24 rounded-lg object-cover" />
+            <img src={school.logo_url} alt={school.name} className="w-24 h-24 rounded-xl object-cover border border-gold/20" />
           ) : (
-            <div className="w-24 h-24 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Building2 className="w-12 h-12 text-blue-600" />
+            <div className="w-24 h-24 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
+              <Building2 className="w-12 h-12 text-primary/60" />
             </div>
           )}
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">{school.name}</h2>
+            <h2 className="text-2xl font-bold text-navy font-display mb-2">{school.name}</h2>
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div>
-                <p className="text-sm text-gray-600">School Code</p>
-                <p className="text-base font-medium text-gray-900">{school.code}</p>
+                <p className="text-xs text-charcoal/50 font-body">Mã cơ sở</p>
+                <p className="text-sm font-semibold text-charcoal font-body mt-0.5">{school.code}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Email</p>
-                <p className="text-base font-medium text-gray-900">{school.email || 'N/A'}</p>
+                <p className="text-xs text-charcoal/50 font-body">Email</p>
+                <p className="text-sm font-semibold text-charcoal font-body mt-0.5">{school.email || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Phone</p>
-                <p className="text-base font-medium text-gray-900">{school.phone || 'N/A'}</p>
+                <p className="text-xs text-charcoal/50 font-body">Điện thoại</p>
+                <p className="text-sm font-semibold text-charcoal font-body mt-0.5">{school.phone || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Location</p>
-                <p className="text-base font-medium text-gray-900">
+                <p className="text-xs text-charcoal/50 font-body">Địa điểm</p>
+                <p className="text-sm font-semibold text-charcoal font-body mt-0.5">
                   {school.city || 'N/A'}
                   {school.state && `, ${school.state}`}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Subscription</p>
-                <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                  school.subscription_tier === 'enterprise' ? 'bg-purple-100 text-purple-800' :
-                  school.subscription_tier === 'premium' ? 'bg-blue-100 text-blue-800' :
-                  school.subscription_tier === 'standard' ? 'bg-green-100 text-green-800' :
-                  'bg-gray-100 text-gray-800'
+                <p className="text-xs text-charcoal/50 font-body">Gói dịch vụ</p>
+                <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full font-body mt-0.5 ${
+                  school.subscription_tier === 'enterprise' ? 'bg-navy/10 text-navy' :
+                  school.subscription_tier === 'premium' ? 'bg-primary/10 text-primary' :
+                  school.subscription_tier === 'standard' ? 'bg-gold/20 text-gold' :
+                  'bg-cream-dark text-charcoal'
                 }`}>
-                  {school.subscription_tier?.toUpperCase() || 'BASIC'}
+                  {school.subscription_tier?.toUpperCase() || 'CƠ BẢN'}
                 </span>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Status</p>
-                <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                  school.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                <p className="text-xs text-charcoal/50 font-body">Trạng thái</p>
+                <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full font-body mt-0.5 ${
+                  school.is_active ? 'bg-green-100 text-green-700' : 'bg-cream-dark text-charcoal/60'
                 }`}>
-                  {school.is_active ? 'Active' : 'Inactive'}
+                  {school.is_active ? 'Hoạt động' : 'Không hoạt động'}
                 </span>
               </div>
             </div>
@@ -146,18 +146,18 @@ function SchoolDashboardTab({ school }: { school: SchoolType | null }) {
         {statCards.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.label} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div key={stat.label} className="bg-white rounded-xl shadow-card border border-gold/20 p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">{stat.label}</p>
+                  <p className="text-xs font-medium text-charcoal/60 font-body">{stat.label}</p>
                   {loading ? (
-                    <div className="h-8 w-16 bg-gray-200 rounded mt-2 animate-pulse" />
+                    <div className="h-8 w-16 bg-gold/20 rounded mt-2 animate-pulse" />
                   ) : (
-                    <p className="text-3xl font-bold text-gray-900 mt-2">{stat.value.toLocaleString()}</p>
+                    <p className="text-3xl font-bold text-navy font-display mt-1">{stat.value.toLocaleString('vi-VN')}</p>
                   )}
                 </div>
-                <div className={`${stat.color} p-3 rounded-lg`}>
-                  <Icon className="w-6 h-6 text-white" />
+                <div className={`${stat.color} p-3 rounded-xl`}>
+                  <Icon className="w-5 h-5 text-white" />
                 </div>
               </div>
             </div>
@@ -166,24 +166,24 @@ function SchoolDashboardTab({ school }: { school: SchoolType | null }) {
       </div>
 
       {/* Limits & Quotas */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">System Limits & Quotas</h3>
+      <div className="bg-white rounded-xl shadow-card border border-gold/20 p-6">
+        <h3 className="text-base font-semibold text-navy font-display mb-4">Giới Hạn & Hạn Ngạch</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div>
-            <p className="text-sm text-gray-600">Max Students</p>
-            <p className="text-2xl font-bold text-gray-900">{school.max_students}</p>
+          <div className="bg-cream rounded-lg p-3">
+            <p className="text-xs text-charcoal/60 font-body">Tối đa học viên</p>
+            <p className="text-2xl font-bold text-navy font-display mt-1">{school.max_students}</p>
           </div>
-          <div>
-            <p className="text-sm text-gray-600">Max Teachers</p>
-            <p className="text-2xl font-bold text-gray-900">{school.max_teachers}</p>
+          <div className="bg-cream rounded-lg p-3">
+            <p className="text-xs text-charcoal/60 font-body">Tối đa giảng viên</p>
+            <p className="text-2xl font-bold text-navy font-display mt-1">{school.max_teachers}</p>
           </div>
-          <div>
-            <p className="text-sm text-gray-600">Max Admins</p>
-            <p className="text-2xl font-bold text-gray-900">{school.max_admins}</p>
+          <div className="bg-cream rounded-lg p-3">
+            <p className="text-xs text-charcoal/60 font-body">Tối đa quản trị</p>
+            <p className="text-2xl font-bold text-navy font-display mt-1">{school.max_admins}</p>
           </div>
-          <div>
-            <p className="text-sm text-gray-600">Storage (GB)</p>
-            <p className="text-2xl font-bold text-gray-900">{school.max_storage_gb}</p>
+          <div className="bg-cream rounded-lg p-3">
+            <p className="text-xs text-charcoal/60 font-body">Lưu trữ (GB)</p>
+            <p className="text-2xl font-bold text-navy font-display mt-1">{school.max_storage_gb}</p>
           </div>
         </div>
       </div>
@@ -195,8 +195,8 @@ function SchoolCustomizationTab({ school }: { school: SchoolType | null }) {
   if (!school) {
     return (
       <div className="text-center py-12">
-        <School className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-        <p className="text-gray-600">No school information available</p>
+        <School className="w-16 h-16 text-gold/30 mx-auto mb-4" />
+        <p className="text-charcoal/60 font-body">Không có thông tin cơ sở</p>
       </div>
     );
   }
@@ -204,178 +204,178 @@ function SchoolCustomizationTab({ school }: { school: SchoolType | null }) {
   return (
     <div className="space-y-6">
       {/* General Settings */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">General Settings</h3>
+      <div className="bg-white rounded-xl border border-gold/20 p-6">
+        <h3 className="text-base font-semibold text-navy font-display mb-4">Cài Đặt Chung</h3>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">School Name</label>
+              <label className="block text-xs font-medium text-charcoal/70 font-body mb-1">Tên cơ sở</label>
               <input
                 type="text"
                 value={school.name}
                 disabled
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700"
+                className="w-full px-3 py-2 border border-gold/30 rounded-lg bg-cream text-charcoal font-body text-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">School Code</label>
+              <label className="block text-xs font-medium text-charcoal/70 font-body mb-1">Mã cơ sở</label>
               <input
                 type="text"
                 value={school.code}
                 disabled
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700"
+                className="w-full px-3 py-2 border border-gold/30 rounded-lg bg-cream text-charcoal font-body text-sm"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-xs font-medium text-charcoal/70 font-body mb-1">Email</label>
             <input
               type="email"
               value={school.email || ''}
               disabled
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700"
+              className="w-full px-3 py-2 border border-gold/30 rounded-lg bg-cream text-charcoal font-body text-sm"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+            <label className="block text-xs font-medium text-charcoal/70 font-body mb-1">Điện thoại</label>
             <input
               type="tel"
               value={school.phone || ''}
               disabled
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700"
+              className="w-full px-3 py-2 border border-gold/30 rounded-lg bg-cream text-charcoal font-body text-sm"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+              <label className="block text-xs font-medium text-charcoal/70 font-body mb-1">Thành phố</label>
               <input
                 type="text"
                 value={school.city || ''}
                 disabled
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700"
+                className="w-full px-3 py-2 border border-gold/30 rounded-lg bg-cream text-charcoal font-body text-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+              <label className="block text-xs font-medium text-charcoal/70 font-body mb-1">Tỉnh/Thành</label>
               <input
                 type="text"
                 value={school.state || ''}
                 disabled
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700"
+                className="w-full px-3 py-2 border border-gold/30 rounded-lg bg-cream text-charcoal font-body text-sm"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+            <label className="block text-xs font-medium text-charcoal/70 font-body mb-1">Quốc gia</label>
             <input
               type="text"
               value={school.country}
               disabled
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700"
+              className="w-full px-3 py-2 border border-gold/30 rounded-lg bg-cream text-charcoal font-body text-sm"
             />
           </div>
         </div>
       </div>
 
       {/* Academic Settings */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Academic Settings</h3>
+      <div className="bg-white rounded-xl border border-gold/20 p-6">
+        <h3 className="text-base font-semibold text-navy font-display mb-4">Cài Đặt Học Thuật</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Academic Year Start</label>
+            <label className="block text-xs font-medium text-charcoal/70 font-body mb-1">Ngày bắt đầu năm học</label>
             <input
               type="date"
               value={school.settings?.academic_year_start || ''}
               disabled
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700"
+              className="w-full px-3 py-2 border border-gold/30 rounded-lg bg-cream text-charcoal font-body text-sm"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Grading System</label>
+            <label className="block text-xs font-medium text-charcoal/70 font-body mb-1">Hệ thống chấm điểm</label>
             <input
               type="text"
               value={school.settings?.grading_system || 'N/A'}
               disabled
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700"
+              className="w-full px-3 py-2 border border-gold/30 rounded-lg bg-cream text-charcoal font-body text-sm"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Attendance Tracking</label>
+            <label className="block text-xs font-medium text-charcoal/70 font-body mb-1">Theo dõi điểm danh</label>
             <input
               type="text"
               value={school.settings?.attendance_tracking || 'N/A'}
               disabled
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700"
+              className="w-full px-3 py-2 border border-gold/30 rounded-lg bg-cream text-charcoal font-body text-sm"
             />
           </div>
         </div>
       </div>
 
       {/* Feature Flags */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Enabled Features</h3>
+      <div className="bg-white rounded-xl border border-gold/20 p-6">
+        <h3 className="text-base font-semibold text-navy font-display mb-4">Tính Năng Đã Bật</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div className="flex items-center gap-2">
             <input
               type="checkbox"
               checked={school.features?.attendance?.enabled || false}
               disabled
-              className="w-4 h-4 text-blue-600 rounded"
+              className="w-4 h-4 rounded accent-primary"
             />
-            <label className="text-sm text-gray-700">Attendance</label>
+            <label className="text-sm text-charcoal font-body">Điểm danh</label>
           </div>
           <div className="flex items-center gap-2">
             <input
               type="checkbox"
               checked={school.features?.grading?.enabled || false}
               disabled
-              className="w-4 h-4 text-blue-600 rounded"
+              className="w-4 h-4 rounded accent-primary"
             />
-            <label className="text-sm text-gray-700">Grading</label>
+            <label className="text-sm text-charcoal font-body">Chấm điểm</label>
           </div>
           <div className="flex items-center gap-2">
             <input
               type="checkbox"
               checked={school.features?.messaging?.enabled || false}
               disabled
-              className="w-4 h-4 text-blue-600 rounded"
+              className="w-4 h-4 rounded accent-primary"
             />
-            <label className="text-sm text-gray-700">Messaging</label>
+            <label className="text-sm text-charcoal font-body">Tin nhắn</label>
           </div>
           <div className="flex items-center gap-2">
             <input
               type="checkbox"
               checked={school.features?.parent_portal?.enabled || false}
               disabled
-              className="w-4 h-4 text-blue-600 rounded"
+              className="w-4 h-4 rounded accent-primary"
             />
-            <label className="text-sm text-gray-700">Parent Portal</label>
+            <label className="text-sm text-charcoal font-body">Cổng phụ huynh</label>
           </div>
           <div className="flex items-center gap-2">
             <input
               type="checkbox"
               checked={school.features?.reports?.enabled || false}
               disabled
-              className="w-4 h-4 text-blue-600 rounded"
+              className="w-4 h-4 rounded accent-primary"
             />
-            <label className="text-sm text-gray-700">Reports</label>
+            <label className="text-sm text-charcoal font-body">Báo cáo</label>
           </div>
           <div className="flex items-center gap-2">
             <input
               type="checkbox"
               checked={school.features?.mobile_app?.enabled || false}
               disabled
-              className="w-4 h-4 text-blue-600 rounded"
+              className="w-4 h-4 rounded accent-primary"
             />
-            <label className="text-sm text-gray-700">Mobile App</label>
+            <label className="text-sm text-charcoal font-body">Ứng dụng di động</label>
           </div>
         </div>
       </div>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <p className="text-sm text-blue-800">
-          <strong>Note:</strong> School customization settings are read-only for Administrators. 
-          Contact your Super Administrator or system administrator to modify these settings.
+      <div className="bg-cream rounded-xl border border-gold/20 p-4">
+        <p className="text-sm text-charcoal/70 font-body">
+          <strong className="text-navy">Lưu ý:</strong> Cài đặt cơ sở ở chế độ chỉ đọc đối với Quản trị viên.
+          Liên hệ Super Admin hoặc quản trị hệ thống để chỉnh sửa các cài đặt này.
         </p>
       </div>
     </div>
@@ -421,7 +421,7 @@ function AdminSchoolsPageContent() {
   if (isLoading || loadingFallback) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -430,39 +430,39 @@ function AdminSchoolsPageContent() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">School Management</h1>
-          <p className="text-gray-600">View your school dashboard and customization settings</p>
+          <h1 className="text-2xl font-bold text-navy font-display">Quản Lý Cơ Sở</h1>
+          <p className="text-charcoal/60 font-body text-sm mt-1">Xem tổng quan và cài đặt cơ sở đào tạo</p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="border-b border-gray-200">
+      <div className="bg-white rounded-xl shadow-card border border-gold/20">
+        <div className="border-b border-gold/20">
           <nav className="flex -mb-px">
             <button
               onClick={() => setActiveTab('dashboard')}
-              className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+              className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors font-body ${
                 activeTab === 'dashboard'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-charcoal/60 hover:text-charcoal hover:border-gold/40'
               }`}
             >
               <div className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5" />
-                <span>Dashboard</span>
+                <BarChart3 className="w-4 h-4" />
+                <span>Tổng quan</span>
               </div>
             </button>
             <button
               onClick={() => setActiveTab('customization')}
-              className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+              className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors font-body ${
                 activeTab === 'customization'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-charcoal/60 hover:text-charcoal hover:border-gold/40'
               }`}
             >
               <div className="flex items-center gap-2">
-                <Settings className="w-5 h-5" />
-                <span>Customization</span>
+                <Settings className="w-4 h-4" />
+                <span>Tùy chỉnh</span>
               </div>
             </button>
           </nav>

@@ -1,7 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { CheckCircle, XCircle, Clock, AlertCircle, Save, Calendar, Users } from 'lucide-react';
-import type { AttendanceStatus, StudentAttendance } from '../../types/attendance';
-import { getClassAttendance, markBulkAttendance } from '../../services/attendanceService';
+import { supabase } from '../../../../shared/lib/supabase';
+
+type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused';
+
+interface StudentRow {
+  student_id: string;
+  student_name: string;
+  student_code: string;
+  existing_id: string | null;
+  status: AttendanceStatus | null;
+}
 
 interface TeacherAttendanceMarkingProps {
   classId: string;
@@ -10,30 +19,85 @@ interface TeacherAttendanceMarkingProps {
 
 export function TeacherAttendanceMarking({ classId, className }: TeacherAttendanceMarkingProps) {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [students, setStudents] = useState<StudentAttendance[]>([]);
+  const [students, setStudents] = useState<StudentRow[]>([]);
+  const [schoolId, setSchoolId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [changes, setChanges] = useState<Map<string, AttendanceStatus>>(new Map());
 
-  useEffect(() => {
-    loadAttendance();
-  }, [classId, date]);
+  const loadAttendance = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    setChanges(new Map());
 
-  async function loadAttendance() {
     try {
-      setLoading(true);
-      setError(null);
-      const data = await getClassAttendance(classId, date);
-      setStudents(data);
-      setChanges(new Map());
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load attendance');
+      // 0. Lấy school_id từ class (cần cho INSERT attendance_records)
+      const { data: classRow } = await supabase
+        .from('classes')
+        .select('school_id')
+        .eq('id', classId)
+        .single();
+      if (classRow?.school_id) setSchoolId(classRow.school_id);
+
+      // 1. Load enrolled students
+      const { data: enr, error: enrErr } = await supabase
+        .from('enrollments')
+        .select('student_id, students(id, first_name, last_name, student_code)')
+        .eq('class_id', classId)
+        .eq('status', 'active');
+
+      if (enrErr) throw enrErr;
+
+      const studentList = (enr ?? [])
+        .filter((e: any) => e.students)
+        .map((e: any) => {
+          const s = e.students;
+          return {
+            student_id: s.id,
+            student_name: `${s.first_name} ${s.last_name}`,
+            student_code: s.student_code ?? '',
+            existing_id: null as string | null,
+            status: null as AttendanceStatus | null,
+          };
+        });
+
+      if (studentList.length === 0) {
+        setStudents([]);
+        setLoading(false);
+        return;
+      }
+
+      // 2. Load existing attendance for selected date
+      const studentIds = studentList.map(s => s.student_id);
+      const { data: att, error: attErr } = await supabase
+        .from('attendance_records')
+        .select('id, student_id, status')
+        .eq('class_id', classId)
+        .eq('attendance_date', date)
+        .in('student_id', studentIds);
+
+      if (attErr) throw attErr;
+
+      const attMap: Record<string, { id: string; status: AttendanceStatus }> = {};
+      (att ?? []).forEach((r: any) => {
+        attMap[r.student_id] = { id: r.id, status: r.status };
+      });
+
+      setStudents(studentList.map(s => ({
+        ...s,
+        existing_id: attMap[s.student_id]?.id ?? null,
+        status: attMap[s.student_id]?.status ?? null,
+      })));
+    } catch (err: any) {
+      setError(err?.message ?? 'Không thể tải dữ liệu điểm danh');
     } finally {
       setLoading(false);
     }
-  }
+  }, [classId, date]);
+
+  useEffect(() => { loadAttendance(); }, [loadAttendance]);
 
   function handleStatusChange(studentId: string, status: AttendanceStatus) {
     setChanges(prev => new Map(prev).set(studentId, status));
@@ -42,143 +106,157 @@ export function TeacherAttendanceMarking({ classId, className }: TeacherAttendan
 
   function handleQuickMarkAll(status: AttendanceStatus) {
     const newChanges = new Map<string, AttendanceStatus>();
-    students.forEach(student => {
-      newChanges.set(student.student_id, status);
-    });
+    students.forEach(s => newChanges.set(s.student_id, status));
     setChanges(newChanges);
     setSuccessMessage(null);
   }
 
   async function handleSave() {
     if (changes.size === 0) {
-      setError('No changes to save');
+      setError('Chưa có thay đổi nào để lưu');
       return;
     }
 
+    setSaving(true);
+    setError(null);
+
     try {
-      setSaving(true);
-      setError(null);
+      const existingMap: Record<string, string> = {};
+      students.forEach(s => { if (s.existing_id) existingMap[s.student_id] = s.existing_id; });
 
-      const records = Array.from(changes.entries()).map(([studentId, status]) => ({
-        class_id: classId,
-        student_id: studentId,
-        attendance_date: date,
-        status,
-        check_in_time: status === 'present' || status === 'late' ? new Date().toTimeString().split(' ')[0] : undefined,
-      }));
+      const toUpsert: any[] = [];
+      changes.forEach((status, studentId) => {
+        const existingId = existingMap[studentId];
+        const base = {
+          class_id: classId,
+          school_id: schoolId,
+          student_id: studentId,
+          attendance_date: date,
+          status,
+        };
+        if (existingId) {
+          toUpsert.push({ id: existingId, ...base });
+        } else {
+          toUpsert.push(base);
+        }
+      });
 
-      await markBulkAttendance(records);
-      setSuccessMessage(`Attendance saved for ${records.length} student${records.length > 1 ? 's' : ''}`);
+      const { error: upsertErr } = await supabase
+        .from('attendance_records')
+        .upsert(toUpsert, { onConflict: 'class_id,student_id,attendance_date' });
+
+      if (upsertErr) throw upsertErr;
+
+      setSuccessMessage(`Đã lưu điểm danh cho ${toUpsert.length} học viên`);
       await loadAttendance();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save attendance');
+    } catch (err: any) {
+      setError(err?.message ?? 'Không thể lưu điểm danh');
     } finally {
       setSaving(false);
     }
   }
 
-  function getDisplayStatus(student: StudentAttendance): AttendanceStatus | null {
-    return changes.get(student.student_id) || student.status || null;
+  function getDisplayStatus(student: StudentRow): AttendanceStatus | null {
+    return changes.get(student.student_id) ?? student.status ?? null;
   }
 
   const statusConfig = {
-    present: { icon: CheckCircle, label: 'Present', color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-600' },
-    absent: { icon: XCircle, label: 'Absent', color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-600' },
-    late: { icon: Clock, label: 'Late', color: 'text-yellow-600', bg: 'bg-yellow-50', border: 'border-yellow-600' },
-    excused: { icon: AlertCircle, label: 'Excused', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-600' },
+    present:  { icon: CheckCircle, label: 'Có mặt',  color: 'text-green-600',  bg: 'bg-green-50',  border: 'border-green-600'  },
+    absent:   { icon: XCircle,     label: 'Vắng mặt', color: 'text-red-600',    bg: 'bg-red-50',    border: 'border-red-600'    },
+    late:     { icon: Clock,       label: 'Đi trễ',   color: 'text-yellow-600', bg: 'bg-yellow-50', border: 'border-yellow-600' },
+    excused:  { icon: AlertCircle, label: 'Có phép',  color: 'text-blue-600',   bg: 'bg-blue-50',   border: 'border-blue-600'   },
   };
 
-  const summary = students.reduce((acc, student) => {
-    const status = getDisplayStatus(student);
-    if (status) {
-      acc[status] = (acc[status] || 0) + 1;
-    } else {
-      acc.unmarked = (acc.unmarked || 0) + 1;
-    }
+  const summary = students.reduce((acc, s) => {
+    const st = getDisplayStatus(s);
+    if (st) acc[st] = (acc[st] || 0) + 1;
+    else acc.unmarked = (acc.unmarked || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="max-w-6xl mx-auto space-y-6">
+      <div className="bg-white rounded-xl shadow-card border border-gold/20 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Mark Attendance</h1>
-            <p className="text-gray-600 mt-1">{className}</p>
+            <h2 className="text-xl font-semibold text-navy font-display">Ghi Nhận Điểm Danh</h2>
+            <p className="text-charcoal/60 font-body text-sm mt-1">{className}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-gray-400" />
+            <Calendar className="w-4 h-4 text-charcoal/40" />
             <input
               type="date"
               value={date}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={e => setDate(e.target.value)}
               max={new Date().toISOString().split('T')[0]}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border border-gold/40 rounded-lg bg-white font-body text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
             />
           </div>
         </div>
 
         {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
             <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <p className="text-red-800">{error}</p>
+            <p className="text-red-800 font-body text-sm">{error}</p>
           </div>
         )}
 
         {successMessage && (
-          <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
+          <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-xl flex items-start gap-3">
             <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-            <p className="text-green-800">{successMessage}</p>
+            <p className="text-green-800 font-body text-sm">{successMessage}</p>
           </div>
         )}
 
+        {/* Summary stats */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+          <div className="bg-cream rounded-xl p-4 border border-gold/20">
             <div className="flex items-center gap-2 mb-1">
-              <Users className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-600">Total</span>
+              <Users className="w-4 h-4 text-charcoal/50" />
+              <span className="text-xs text-charcoal/60 font-body">Tổng</span>
             </div>
-            <p className="text-2xl font-semibold text-gray-900">{students.length}</p>
+            <p className="text-2xl font-bold text-navy font-display">{students.length}</p>
           </div>
-          <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+          <div className="bg-green-50 rounded-xl p-4 border border-green-200">
             <div className="flex items-center gap-2 mb-1">
               <CheckCircle className="w-4 h-4 text-green-600" />
-              <span className="text-sm text-green-700">Present</span>
+              <span className="text-xs text-green-700 font-body">Có mặt</span>
             </div>
-            <p className="text-2xl font-semibold text-green-700">{summary.present || 0}</p>
+            <p className="text-2xl font-bold text-green-700 font-display">{summary.present || 0}</p>
           </div>
-          <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+          <div className="bg-red-50 rounded-xl p-4 border border-red-200">
             <div className="flex items-center gap-2 mb-1">
               <XCircle className="w-4 h-4 text-red-600" />
-              <span className="text-sm text-red-700">Absent</span>
+              <span className="text-xs text-red-700 font-body">Vắng mặt</span>
             </div>
-            <p className="text-2xl font-semibold text-red-700">{summary.absent || 0}</p>
+            <p className="text-2xl font-bold text-red-700 font-display">{summary.absent || 0}</p>
           </div>
-          <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+          <div className="bg-yellow-50 rounded-xl p-4 border border-yellow-200">
             <div className="flex items-center gap-2 mb-1">
               <Clock className="w-4 h-4 text-yellow-600" />
-              <span className="text-sm text-yellow-700">Late</span>
+              <span className="text-xs text-yellow-700 font-body">Đi trễ</span>
             </div>
-            <p className="text-2xl font-semibold text-yellow-700">{summary.late || 0}</p>
+            <p className="text-2xl font-bold text-yellow-700 font-display">{summary.late || 0}</p>
           </div>
-          <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+          <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
             <div className="flex items-center gap-2 mb-1">
               <AlertCircle className="w-4 h-4 text-blue-600" />
-              <span className="text-sm text-blue-700">Excused</span>
+              <span className="text-xs text-blue-700 font-body">Có phép</span>
             </div>
-            <p className="text-2xl font-semibold text-blue-700">{summary.excused || 0}</p>
+            <p className="text-2xl font-bold text-blue-700 font-display">{summary.excused || 0}</p>
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-6 pb-6 border-b border-gray-200">
-          <span className="text-sm font-medium text-gray-700 self-center">Quick Mark All:</span>
+        {/* Quick mark all */}
+        <div className="flex flex-wrap gap-2 mb-6 pb-6 border-b border-gold/20">
+          <span className="text-sm font-medium text-charcoal/70 font-body self-center">Đánh dấu tất cả:</span>
           {Object.entries(statusConfig).map(([status, config]) => {
             const Icon = config.icon;
             return (
               <button
                 key={status}
                 onClick={() => handleQuickMarkAll(status as AttendanceStatus)}
-                className={`px-4 py-2 rounded-lg border-2 ${config.bg} ${config.border} ${config.color} font-medium text-sm hover:opacity-80 transition-opacity flex items-center gap-2`}
+                className={`px-4 py-2 rounded-lg border-2 ${config.bg} ${config.border} ${config.color} font-semibold font-body text-sm hover:opacity-80 transition-opacity flex items-center gap-2`}
               >
                 <Icon className="w-4 h-4" />
                 {config.label}
@@ -187,40 +265,34 @@ export function TeacherAttendanceMarking({ classId, className }: TeacherAttendan
           })}
         </div>
 
+        {/* Student list */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
           </div>
         ) : (
           <div className="space-y-2">
-            {students.map((student) => {
+            {students.map(student => {
               const currentStatus = getDisplayStatus(student);
               const hasChange = changes.has(student.student_id);
-
               return (
                 <div
                   key={student.student_id}
-                  className={`flex items-center justify-between p-4 rounded-lg border-2 transition-all ${
-                    hasChange ? 'bg-blue-50 border-blue-300' : 'bg-gray-50 border-gray-200'
+                  className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all ${
+                    hasChange ? 'bg-primary/5 border-primary/30' : 'bg-cream border-gold/20'
                   }`}
                 >
                   <div className="flex items-center gap-4">
-                    {student.student_photo ? (
-                      <img
-                        src={student.student_photo}
-                        alt={student.student_name}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
-                        <span className="text-gray-600 font-medium text-lg">
-                          {student.student_name.charAt(0)}
-                        </span>
-                      </div>
-                    )}
+                    <div className="w-12 h-12 rounded-full bg-gold/20 border-2 border-gold/30 flex items-center justify-center">
+                      <span className="text-navy font-semibold font-display text-lg">
+                        {student.student_name.charAt(0)}
+                      </span>
+                    </div>
                     <div>
-                      <p className="font-medium text-gray-900">{student.student_name}</p>
-                      <p className="text-sm text-gray-500">{student.student_code}</p>
+                      <p className="font-semibold text-navy font-body">{student.student_name}</p>
+                      {student.student_code && (
+                        <p className="text-xs text-charcoal/50 font-body">{student.student_code}</p>
+                      )}
                     </div>
                   </div>
 
@@ -228,15 +300,14 @@ export function TeacherAttendanceMarking({ classId, className }: TeacherAttendan
                     {Object.entries(statusConfig).map(([status, config]) => {
                       const Icon = config.icon;
                       const isSelected = currentStatus === status;
-
                       return (
                         <button
                           key={status}
                           onClick={() => handleStatusChange(student.student_id, status as AttendanceStatus)}
-                          className={`p-3 rounded-lg border-2 transition-all ${
+                          className={`p-3 rounded-xl border-2 transition-all ${
                             isSelected
                               ? `${config.bg} ${config.border} ${config.color}`
-                              : 'bg-white border-gray-300 text-gray-400 hover:border-gray-400'
+                              : 'bg-white border-gold/30 text-charcoal/30 hover:border-gold/60'
                           }`}
                           title={config.label}
                         >
@@ -252,35 +323,35 @@ export function TeacherAttendanceMarking({ classId, className }: TeacherAttendan
         )}
 
         {!loading && students.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
-            <Users className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-            <p>No students enrolled in this class</p>
+          <div className="text-center py-12">
+            <Users className="w-12 h-12 mx-auto mb-3 text-gold/30" />
+            <p className="text-charcoal/50 font-body text-sm">Chưa có học viên nào trong lớp này</p>
           </div>
         )}
 
         {students.length > 0 && (
-          <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
+          <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-gold/20">
             <button
               onClick={loadAttendance}
               disabled={saving}
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              className="px-5 py-2.5 border border-gold/40 rounded-lg text-charcoal font-body text-sm hover:bg-cream disabled:opacity-50 transition-colors"
             >
-              Reset
+              Đặt lại
             </button>
             <button
               onClick={handleSave}
               disabled={saving || changes.size === 0}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-2.5 bg-primary text-white rounded-lg hover:bg-primary-light disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-body font-semibold text-sm shadow-sm transition-colors"
             >
               {saving ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  Saving...
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                  Đang lưu...
                 </>
               ) : (
                 <>
                   <Save className="w-4 h-4" />
-                  Save Attendance ({changes.size})
+                  Lưu điểm danh ({changes.size})
                 </>
               )}
             </button>

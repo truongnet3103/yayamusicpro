@@ -1,8 +1,8 @@
 /**
  * School Admin Dashboard
- * 
+ *
  * Role: Admin (school-scoped)
- * 
+ *
  * TODO: Backend must validate:
  * - User has 'admin:view' capability
  * - User's school_id matches requested school_id
@@ -30,34 +30,34 @@ function AdminDashboardContent() {
   const stats = [
     {
       icon: Users,
-      label: 'Students',
+      label: 'Học viên',
       value: overview?.student_count?.toString() || '0',
       change: '+0',
-      color: 'bg-blue-100 text-blue-600',
+      color: 'bg-primary/10 text-primary',
       link: '/admin/users?type=student',
     },
     {
       icon: School,
-      label: 'Teachers',
+      label: 'Giảng viên',
       value: overview?.teacher_count?.toString() || '0',
       change: '+0',
-      color: 'bg-green-100 text-green-600',
+      color: 'bg-gold/20 text-gold',
       link: '/admin/users?type=teacher',
     },
     {
       icon: BookOpen,
-      label: 'Classes',
+      label: 'Lớp học',
       value: overview?.class_count?.toString() || '0',
       change: '+0',
-      color: 'bg-purple-100 text-purple-600',
+      color: 'bg-navy/10 text-navy',
       link: '/admin/classes',
     },
     {
       icon: TrendingUp,
-      label: 'Attendance Rate',
+      label: 'Tỷ lệ điểm danh',
       value: attendance?.week.rate ? `${attendance.week.rate}%` : '0%',
       change: attendance?.week.rate ? `+${attendance.week.rate}%` : '+0%',
-      color: 'bg-orange-100 text-orange-600',
+      color: 'bg-green-100 text-green-700',
       link: '/admin/reports',
     },
   ];
@@ -71,7 +71,7 @@ function AdminDashboardContent() {
       case 'down':
         return 'bg-red-50 border-red-200 text-red-800';
       default:
-        return 'bg-gray-50 border-gray-200 text-gray-800';
+        return 'bg-cream border-gold/20 text-charcoal';
     }
   };
 
@@ -82,9 +82,9 @@ function AdminDashboardContent() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">School Dashboard</h1>
-        <p className="text-gray-600">
-          Welcome back, {profile?.first_name}! {school?.name && `Managing ${school.name}`}
+        <h1 className="text-2xl font-bold text-navy font-display">Tổng Quan Trung Tâm</h1>
+        <p className="text-charcoal/60 font-body text-sm mt-1">
+          Xin chào, {profile?.first_name}! {school?.name && `Đang quản lý ${school.name}`}
         </p>
       </div>
 
@@ -93,16 +93,16 @@ function AdminDashboardContent() {
         {stats.map((stat) => {
           const Icon = stat.icon;
           const StatCard = (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-xl shadow-card border border-gold/20 p-6 hover:shadow-elegant transition-shadow">
               <div className="flex items-center justify-between">
                 <div className={`p-3 rounded-lg ${stat.color}`}>
-                  <Icon className="w-6 h-6" />
+                  <Icon className="w-5 h-5" />
                 </div>
-                <span className="text-sm font-medium text-green-600">{stat.change}</span>
+                <span className="text-sm font-medium text-green-600 font-body">{stat.change}</span>
               </div>
               <div className="mt-4">
-                <h3 className="text-sm font-medium text-gray-600">{stat.label}</h3>
-                <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                <h3 className="text-sm font-medium text-charcoal/60 font-body">{stat.label}</h3>
+                <p className="text-2xl font-bold text-navy font-display mt-1">{stat.value}</p>
               </div>
             </div>
           );
@@ -119,24 +119,24 @@ function AdminDashboardContent() {
 
       {/* Attendance Summary */}
       {attendance && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Attendance Summary</h2>
+        <div className="bg-white rounded-xl shadow-card border border-gold/20 p-6">
+          <h2 className="text-lg font-semibold text-navy font-display mb-4">Tóm Tắt Điểm Danh</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>
-              <p className="text-sm text-gray-600">Today - Present</p>
-              <p className="text-2xl font-bold text-green-600">{attendance.today.present}</p>
+            <div className="bg-cream rounded-lg p-3">
+              <p className="text-xs text-charcoal/60 font-body">Hôm nay — Có mặt</p>
+              <p className="text-2xl font-bold text-green-600 font-display mt-1">{attendance.today.present}</p>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Today - Absent</p>
-              <p className="text-2xl font-bold text-red-600">{attendance.today.absent}</p>
+            <div className="bg-cream rounded-lg p-3">
+              <p className="text-xs text-charcoal/60 font-body">Hôm nay — Vắng mặt</p>
+              <p className="text-2xl font-bold text-red-500 font-display mt-1">{attendance.today.absent}</p>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">This Week - Rate</p>
-              <p className="text-2xl font-bold text-blue-600">{attendance.week.rate}%</p>
+            <div className="bg-cream rounded-lg p-3">
+              <p className="text-xs text-charcoal/60 font-body">Tuần này — Tỷ lệ</p>
+              <p className="text-2xl font-bold text-primary font-display mt-1">{attendance.week.rate}%</p>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">This Week - Total</p>
-              <p className="text-2xl font-bold text-gray-900">{attendance.week.total}</p>
+            <div className="bg-cream rounded-lg p-3">
+              <p className="text-xs text-charcoal/60 font-body">Tuần này — Tổng</p>
+              <p className="text-2xl font-bold text-navy font-display mt-1">{attendance.week.total}</p>
             </div>
           </div>
         </div>
@@ -144,32 +144,32 @@ function AdminDashboardContent() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Activity */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-xl shadow-card border border-gold/20 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+            <h2 className="text-lg font-semibold text-navy font-display">Hoạt Động Gần Đây</h2>
           </div>
           <div className="space-y-4">
             {overview?.recent_activity && overview.recent_activity.length > 0 ? (
               overview.recent_activity.map((activity) => (
                 <div key={activity.id} className="flex items-start gap-3">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
+                  <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
                   <div className="flex-1">
-                    <p className="text-sm text-gray-900">{activity.message}</p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(activity.timestamp).toLocaleString('en-PH')}
+                    <p className="text-sm text-charcoal font-body">{activity.message}</p>
+                    <p className="text-xs text-charcoal/40 font-body mt-0.5">
+                      {new Date(activity.timestamp).toLocaleString('vi-VN')}
                     </p>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-gray-500 text-center py-4">No recent activity</p>
+              <p className="text-sm text-charcoal/50 font-body text-center py-4">Chưa có hoạt động nào</p>
             )}
           </div>
         </div>
 
         {/* System Status */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">System Status</h2>
+        <div className="bg-white rounded-xl shadow-card border border-gold/20 p-6">
+          <h2 className="text-lg font-semibold text-navy font-display mb-4">Trạng Thái Hệ Thống</h2>
           <div className="space-y-4">
             {overview?.system_status && (
               <div className={`p-4 rounded-lg border ${getStatusColor(overview.system_status.status)}`}>
@@ -179,24 +179,24 @@ function AdminDashboardContent() {
                   ) : (
                     <AlertCircle className="w-5 h-5" />
                   )}
-                  <span className="font-medium capitalize">{overview.system_status.status}</span>
+                  <span className="font-medium font-body capitalize">{overview.system_status.status}</span>
                 </div>
-                <p className="text-sm">{overview.system_status.message}</p>
+                <p className="text-sm font-body">{overview.system_status.message}</p>
               </div>
             )}
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">API Status</span>
-                <span className="text-green-600 font-medium">Operational</span>
+                <span className="text-charcoal/60 font-body">Trạng thái API</span>
+                <span className="text-green-600 font-medium font-body">Hoạt động</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">Database</span>
-                <span className="text-green-600 font-medium">Connected</span>
+                <span className="text-charcoal/60 font-body">Cơ sở dữ liệu</span>
+                <span className="text-green-600 font-medium font-body">Đã kết nối</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">Last Backup</span>
-                <span className="text-gray-900">
-                  {new Date().toLocaleDateString('en-PH')}
+                <span className="text-charcoal/60 font-body">Sao lưu lần cuối</span>
+                <span className="text-charcoal font-body">
+                  {new Date().toLocaleDateString('vi-VN')}
                 </span>
               </div>
             </div>
@@ -205,36 +205,36 @@ function AdminDashboardContent() {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+      <div className="bg-white rounded-xl shadow-card border border-gold/20 p-6">
+        <h2 className="text-lg font-semibold text-navy font-display mb-4">Thao Tác Nhanh</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Link
             to="/admin/users"
-            className="p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors text-center"
+            className="p-4 bg-primary/5 hover:bg-primary/10 rounded-xl border border-primary/20 transition-colors text-center group"
           >
-            <Users className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-            <p className="text-sm font-medium text-gray-900">Manage Users</p>
+            <Users className="w-6 h-6 text-primary mx-auto mb-2" />
+            <p className="text-sm font-medium text-navy font-body">Quản lý người dùng</p>
           </Link>
           <Link
             to="/admin/classes"
-            className="p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition-colors text-center"
+            className="p-4 bg-navy/5 hover:bg-navy/10 rounded-xl border border-navy/20 transition-colors text-center"
           >
-            <BookOpen className="w-6 h-6 text-purple-600 mx-auto mb-2" />
-            <p className="text-sm font-medium text-gray-900">Manage Classes</p>
+            <BookOpen className="w-6 h-6 text-navy mx-auto mb-2" />
+            <p className="text-sm font-medium text-navy font-body">Quản lý lớp học</p>
           </Link>
           <Link
             to="/admin/settings"
-            className="p-4 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors text-center"
+            className="p-4 bg-gold/10 hover:bg-gold/20 rounded-xl border border-gold/30 transition-colors text-center"
           >
-            <School className="w-6 h-6 text-gray-600 mx-auto mb-2" />
-            <p className="text-sm font-medium text-gray-900">School Settings</p>
+            <School className="w-6 h-6 text-gold mx-auto mb-2" />
+            <p className="text-sm font-medium text-navy font-body">Cài đặt trung tâm</p>
           </Link>
           <Link
             to="/admin/reports"
-            className="p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-colors text-center"
+            className="p-4 bg-green-50 hover:bg-green-100 rounded-xl border border-green-200 transition-colors text-center"
           >
             <TrendingUp className="w-6 h-6 text-green-600 mx-auto mb-2" />
-            <p className="text-sm font-medium text-gray-900">View Reports</p>
+            <p className="text-sm font-medium text-navy font-body">Xem báo cáo</p>
           </Link>
         </div>
       </div>

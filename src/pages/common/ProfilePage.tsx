@@ -1,17 +1,16 @@
 /**
  * Profile Page
- * 
+ *
  * User profile dashboard - accessible to all roles
  * Shows role-specific information
  * School-scoped and respects multi-tenancy
  */
 
-import { User, Mail, Phone, Calendar, MapPin, Briefcase, Award, BookOpen, Edit, Save, X, Upload, Camera } from 'lucide-react';
+import { Mail, Phone, Calendar, Briefcase, Award, BookOpen, Edit, Save, X, Camera } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useUser } from '../../domains/auth/contexts/UserContext';
 import { useTenant } from '../../shared/contexts/TenantContext';
 import { RoleGuard } from '../../shared/components/guards/RoleGuard';
-import { PermissionGuard } from '../../shared/components/guards/PermissionGuard';
 import { supabase } from '../../shared/lib/supabase';
 import { uploadAvatar } from '../../shared/services/avatarService';
 
@@ -23,6 +22,18 @@ interface TeacherInfo {
   qualification?: string;
   status: 'active' | 'inactive' | 'on_leave';
 }
+
+const teacherStatusLabel: Record<string, string> = {
+  active: 'Đang hoạt động',
+  on_leave: 'Đang nghỉ phép',
+  inactive: 'Không hoạt động',
+};
+
+const teacherStatusStyle: Record<string, string> = {
+  active: 'bg-primary/10 text-primary',
+  on_leave: 'bg-gold/10 text-gold-dark',
+  inactive: 'bg-charcoal/10 text-charcoal',
+};
 
 function ProfilePageContent() {
   const { profile } = useUser();
@@ -165,7 +176,7 @@ function ProfilePageContent() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -174,40 +185,40 @@ function ProfilePageContent() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
-          <p className="text-gray-600">View and manage your profile information</p>
+          <h1 className="font-display text-2xl font-bold text-navy">Hồ Sơ Cá Nhân</h1>
+          <p className="font-body text-charcoal/70">Xem và quản lý thông tin cá nhân</p>
         </div>
         {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-light font-body text-sm font-semibold transition-colors"
           >
             <Edit className="w-4 h-4" />
-            <span>Edit Profile</span>
+            <span>Chỉnh sửa</span>
           </button>
         )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Card */}
-        <div className="lg:col-span-1 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="lg:col-span-1 bg-white rounded-xl border border-gold/20 shadow-card p-6">
           <div className="text-center">
-            <div className="relative inline-block">
+            <div className="relative inline-block mb-4">
               {previewUrl ? (
                 <img
                   src={previewUrl}
-                  alt="Preview"
-                  className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
+                  alt="Xem trước"
+                  className="w-24 h-24 rounded-full mx-auto object-cover"
                 />
               ) : profile?.avatar_url ? (
                 <img
                   src={profile.avatar_url}
                   alt={profile.full_name}
-                  className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
+                  className="w-24 h-24 rounded-full mx-auto object-cover"
                 />
               ) : (
-                <div className="w-24 h-24 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <span className="text-3xl font-semibold text-blue-600">
+                <div className="w-24 h-24 bg-primary/10 rounded-full mx-auto flex items-center justify-center">
+                  <span className="font-display text-3xl font-semibold text-primary">
                     {profile?.first_name?.[0]}{profile?.last_name?.[0]}
                   </span>
                 </div>
@@ -216,9 +227,9 @@ function ProfilePageContent() {
                 <>
                   <button
                     onClick={handleAvatarClick}
-                    className="absolute bottom-0 right-0 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors shadow-md"
+                    className="absolute bottom-0 right-0 p-2 bg-primary text-white rounded-full hover:bg-primary-light transition-colors shadow-md"
                     type="button"
-                    title="Upload photo"
+                    title="Tải ảnh lên"
                   >
                     <Camera className="w-4 h-4" />
                   </button>
@@ -233,16 +244,16 @@ function ProfilePageContent() {
               )}
             </div>
             {selectedFile && isEditing && (
-              <p className="text-xs text-gray-500 mb-2">
+              <p className="font-body text-xs text-charcoal/50 mb-2">
                 {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
               </p>
             )}
-            <h2 className="text-xl font-bold text-gray-900 mb-1">{profile?.full_name}</h2>
-            <p className="text-sm text-gray-600 capitalize mb-4">{profile?.user_type}</p>
+            <h2 className="font-display text-xl font-bold text-navy mb-1">{profile?.full_name}</h2>
+            <p className="font-body text-sm text-charcoal/60 capitalize mb-4">{profile?.user_type}</p>
             {school && (
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm font-medium text-gray-900">{school.name}</p>
-                <p className="text-xs text-gray-500">{school.code}</p>
+              <div className="p-3 bg-cream-dark rounded-xl border border-gold/20">
+                <p className="font-body text-sm font-medium text-navy">{school.name}</p>
+                <p className="font-body text-xs text-charcoal/50">{school.code}</p>
               </div>
             )}
           </div>
@@ -251,34 +262,34 @@ function ProfilePageContent() {
         {/* Profile Details */}
         <div className="lg:col-span-2 space-y-6">
           {/* Personal Information */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-xl border border-gold/20 shadow-card p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Personal Information</h3>
+              <h3 className="font-display text-lg font-semibold text-navy">Thông Tin Cá Nhân</h3>
               {isEditing && (
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handleSave}
                     disabled={uploading}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-light font-body text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {uploading ? (
                       <>
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Saving...</span>
+                        <span>Đang lưu...</span>
                       </>
                     ) : (
                       <>
                         <Save className="w-4 h-4" />
-                        <span>Save</span>
+                        <span>Lưu</span>
                       </>
                     )}
                   </button>
                   <button
                     onClick={handleCancel}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-cream-dark text-charcoal rounded-lg hover:bg-gold/10 font-body text-sm transition-colors border border-gold/20"
                   >
                     <X className="w-4 h-4" />
-                    <span>Cancel</span>
+                    <span>Hủy</span>
                   </button>
                 </div>
               )}
@@ -287,35 +298,35 @@ function ProfilePageContent() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                  <label className="block font-body text-sm font-medium text-charcoal/70 mb-1">Tên</label>
                   {isEditing ? (
                     <input
                       type="text"
                       value={editedProfile.first_name}
                       onChange={(e) => setEditedProfile({ ...editedProfile, first_name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gold/40 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary font-body text-sm transition-colors"
                     />
                   ) : (
-                    <p className="text-gray-900">{profile?.first_name}</p>
+                    <p className="font-body text-navy">{profile?.first_name}</p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                  <label className="block font-body text-sm font-medium text-charcoal/70 mb-1">Họ</label>
                   {isEditing ? (
                     <input
                       type="text"
                       value={editedProfile.last_name}
                       onChange={(e) => setEditedProfile({ ...editedProfile, last_name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gold/40 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary font-body text-sm transition-colors"
                     />
                   ) : (
-                    <p className="text-gray-900">{profile?.last_name}</p>
+                    <p className="font-body text-navy">{profile?.last_name}</p>
                   )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                <label className="flex items-center gap-2 font-body text-sm font-medium text-charcoal/70 mb-1">
                   <Mail className="w-4 h-4" />
                   Email
                 </label>
@@ -324,38 +335,38 @@ function ProfilePageContent() {
                     type="email"
                     value={editedProfile.email}
                     onChange={(e) => setEditedProfile({ ...editedProfile, email: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gold/40 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary font-body text-sm transition-colors"
                   />
                 ) : (
-                  <p className="text-gray-900">{profile?.email}</p>
+                  <p className="font-body text-navy">{profile?.email}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                <label className="flex items-center gap-2 font-body text-sm font-medium text-charcoal/70 mb-1">
                   <Phone className="w-4 h-4" />
-                  Phone
+                  Số điện thoại
                 </label>
                 {isEditing ? (
                   <input
                     type="tel"
                     value={editedProfile.phone}
                     onChange={(e) => setEditedProfile({ ...editedProfile, phone: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gold/40 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary font-body text-sm transition-colors"
                   />
                 ) : (
-                  <p className="text-gray-900">{profile?.phone || 'Not provided'}</p>
+                  <p className="font-body text-navy">{profile?.phone || 'Chưa cung cấp'}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Account Status</label>
-                <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                  profile?.is_active 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-gray-100 text-gray-800'
+                <label className="block font-body text-sm font-medium text-charcoal/70 mb-1">Trạng thái tài khoản</label>
+                <span className={`inline-flex px-2 py-1 font-body text-xs font-medium rounded-full ${
+                  profile?.is_active
+                    ? 'bg-primary/10 text-primary'
+                    : 'bg-charcoal/10 text-charcoal'
                 }`}>
-                  {profile?.is_active ? 'Active' : 'Inactive'}
+                  {profile?.is_active ? 'Đang hoạt động' : 'Không hoạt động'}
                 </span>
               </div>
             </div>
@@ -363,56 +374,52 @@ function ProfilePageContent() {
 
           {/* Teacher-Specific Information */}
           {profile?.user_type === 'teacher' && teacherInfo && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Briefcase className="w-5 h-5" />
-                Teacher Information
+            <div className="bg-white rounded-xl border border-gold/20 shadow-card p-6">
+              <h3 className="font-display text-lg font-semibold text-navy mb-4 flex items-center gap-2">
+                <Briefcase className="w-5 h-5 text-primary" />
+                Thông Tin Giảng Viên
               </h3>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Employee Code</label>
-                  <p className="text-gray-900">{teacherInfo.employee_code}</p>
+                  <label className="block font-body text-sm font-medium text-charcoal/70 mb-1">Mã nhân viên</label>
+                  <p className="font-body text-navy">{teacherInfo.employee_code}</p>
                 </div>
                 {teacherInfo.hire_date && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                    <label className="flex items-center gap-2 font-body text-sm font-medium text-charcoal/70 mb-1">
                       <Calendar className="w-4 h-4" />
-                      Hire Date
+                      Ngày tuyển dụng
                     </label>
-                    <p className="text-gray-900">
-                      {new Date(teacherInfo.hire_date).toLocaleDateString()}
+                    <p className="font-body text-navy">
+                      {new Date(teacherInfo.hire_date).toLocaleDateString('vi-VN')}
                     </p>
                   </div>
                 )}
                 {teacherInfo.specialization && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                    <label className="flex items-center gap-2 font-body text-sm font-medium text-charcoal/70 mb-1">
                       <BookOpen className="w-4 h-4" />
-                      Specialization
+                      Chuyên môn
                     </label>
-                    <p className="text-gray-900">{teacherInfo.specialization}</p>
+                    <p className="font-body text-navy">{teacherInfo.specialization}</p>
                   </div>
                 )}
                 {teacherInfo.qualification && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                    <label className="flex items-center gap-2 font-body text-sm font-medium text-charcoal/70 mb-1">
                       <Award className="w-4 h-4" />
-                      Qualification
+                      Bằng cấp
                     </label>
-                    <p className="text-gray-900">{teacherInfo.qualification}</p>
+                    <p className="font-body text-navy">{teacherInfo.qualification}</p>
                   </div>
                 )}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                  <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                    teacherInfo.status === 'active' ? 'bg-green-100 text-green-800' :
-                    teacherInfo.status === 'on_leave' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-gray-100 text-gray-800'
+                  <label className="block font-body text-sm font-medium text-charcoal/70 mb-1">Trạng thái</label>
+                  <span className={`inline-flex px-2 py-1 font-body text-xs font-medium rounded-full ${
+                    teacherStatusStyle[teacherInfo.status] || teacherStatusStyle.inactive
                   }`}>
-                    {teacherInfo.status === 'active' ? 'Active' :
-                     teacherInfo.status === 'on_leave' ? 'On Leave' :
-                     'Inactive'}
+                    {teacherStatusLabel[teacherInfo.status] || teacherInfo.status}
                   </span>
                 </div>
               </div>
@@ -420,23 +427,15 @@ function ProfilePageContent() {
           )}
 
           {/* Account Information */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Account Information</h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                <span className="text-sm text-gray-600">Member Since</span>
-                <span className="text-sm font-medium text-gray-900">
-                  {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'N/A'}
+          <div className="bg-white rounded-xl border border-gold/20 shadow-card p-6">
+            <h3 className="font-display text-lg font-semibold text-navy mb-4">Thông Tin Tài Khoản</h3>
+            <div className="space-y-0">
+              <div className="flex items-center justify-between py-3 border-b border-gold/20">
+                <span className="font-body text-sm text-charcoal/60">Ngày tham gia</span>
+                <span className="font-body text-sm font-medium text-navy">
+                  {profile?.created_at ? new Date(profile.created_at).toLocaleDateString('vi-VN') : 'Không có'}
                 </span>
               </div>
-              {profile?.last_login_at && (
-                <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                  <span className="text-sm text-gray-600">Last Login</span>
-                  <span className="text-sm font-medium text-gray-900">
-                    {new Date(profile.last_login_at).toLocaleString()}
-                  </span>
-                </div>
-              )}
             </div>
           </div>
         </div>

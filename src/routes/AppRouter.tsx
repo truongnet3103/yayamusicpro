@@ -14,6 +14,7 @@ import { AdminSchoolsPage } from '../pages/admin/AdminSchoolsPage';
 import { AdminUsersPage } from '../pages/admin/AdminUsersPage';
 import { AdminRolesPage } from '../pages/admin/AdminRolesPage';
 import { AdminClassesPage } from '../pages/admin/AdminClassesPage';
+import { AdminScheduleSlotsPage } from '../pages/admin/AdminScheduleSlotsPage';
 import { AdminReportsPage } from '../pages/admin/AdminReportsPage';
 import { AdminSettingsPage } from '../pages/admin/AdminSettingsPage';
 import { TeacherDashboard } from '../pages/teacher/TeacherDashboard';
@@ -39,6 +40,12 @@ import { StudentSchedulePage } from '../pages/student/StudentSchedulePage';
 import { StudentClassesPage } from '../pages/student/StudentClassesPage';
 import { ITDashboard } from '../pages/it/ITDashboard';
 import { SuperAdminDashboard } from '../pages/superadmin/SuperAdminDashboard';
+import { SuperAdminSchoolsPage } from '../pages/superadmin/SuperAdminSchoolsPage';
+import { SuperAdminUsersPage } from '../pages/superadmin/SuperAdminUsersPage';
+import { SuperAdminCoursesPage } from '../pages/superadmin/SuperAdminCoursesPage';
+import { SuperAdminClassesPage } from '../pages/superadmin/SuperAdminClassesPage';
+import { SuperAdminSubscriptionsPage } from '../pages/superadmin/SuperAdminSubscriptionsPage';
+import { SuperAdminLogsPage } from '../pages/superadmin/SuperAdminLogsPage';
 
 import { NotificationSettings } from '../domains/communication/components/notifications/NotificationSettings';
 import { ProfilePage } from '../pages/common/ProfilePage';
@@ -56,14 +63,18 @@ function RootRedirect() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex items-center justify-center min-h-screen bg-cream">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (!profile) {
-    return <Navigate to="/login" replace />;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-cream">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   const redirectPath = getRoleBasedRoute(profile.user_type);
@@ -75,8 +86,8 @@ function DashboardRedirect() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex items-center justify-center min-h-screen bg-cream">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -94,6 +105,7 @@ export function AppRouter() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<RootRedirect />} />
+        <Route path="/landingpage" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
@@ -104,6 +116,12 @@ export function AppRouter() {
 
             <Route element={<RoleRoute allowedRoles={['super_admin']} />}>
               <Route path="/superadmin" element={<SuperAdminDashboard />} />
+              <Route path="/superadmin/schools" element={<SuperAdminSchoolsPage />} />
+              <Route path="/superadmin/users" element={<SuperAdminUsersPage />} />
+              <Route path="/superadmin/courses" element={<SuperAdminCoursesPage />} />
+              <Route path="/superadmin/classes" element={<SuperAdminClassesPage />} />
+              <Route path="/superadmin/subscriptions" element={<SuperAdminSubscriptionsPage />} />
+              <Route path="/superadmin/logs" element={<SuperAdminLogsPage />} />
             </Route>
 
             <Route element={<RoleRoute allowedRoles={['it_admin']} />}>
@@ -115,9 +133,16 @@ export function AppRouter() {
               <Route path="/admin/schools" element={<AdminSchoolsPage />} />
               <Route path="/admin/users" element={<AdminUsersPage />} />
               <Route path="/admin/roles" element={<AdminRolesPage />} />
-              <Route path="/admin/classes" element={<AdminClassesPage />} />
               <Route path="/admin/reports" element={<AdminReportsPage />} />
               <Route path="/admin/settings" element={<AdminSettingsPage />} />
+            </Route>
+
+            <Route element={<RoleRoute allowedRoles={['admin', 'staff', 'super_admin']} />}>
+              <Route path="/admin/classes" element={<AdminClassesPage />} />
+            </Route>
+
+            <Route element={<RoleRoute allowedRoles={['admin', 'staff', 'super_admin']} />}>
+              <Route path="/admin/schedule-slots" element={<AdminScheduleSlotsPage />} />
             </Route>
 
             <Route element={<RoleRoute allowedRoles={['teacher']} />}>

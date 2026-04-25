@@ -1,13 +1,12 @@
 /**
  * Parent Grades Page
- * 
+ *
  * View grades for all children (published only)
  * School-scoped and respects multi-tenancy
  */
 
 import { Award, Users, BookOpen } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useUser } from '../../domains/auth/contexts/UserContext';
 import { RoleGuard } from '../../shared/components/guards/RoleGuard';
 import { PermissionGuard } from '../../shared/components/guards/PermissionGuard';
@@ -15,7 +14,7 @@ import { useParentStudents } from '../../domains/academic/hooks/useParentStudent
 import { DashboardSkeleton } from '../../shared/components/LoadingSkeleton';
 
 function ParentGradesPageContent() {
-  const { profile } = useUser();
+  useUser();
   const { data: students, loading: studentsLoading } = useParentStudents();
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
 
@@ -39,13 +38,13 @@ function ParentGradesPageContent() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Grades</h1>
-          <p className="text-gray-600">View grades for your children</p>
+          <h1 className="font-display text-2xl font-bold text-navy">Kết Quả Học Tập</h1>
+          <p className="font-body text-charcoal/70">Xem kết quả học tập của con em</p>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-          <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Children Linked</h3>
-          <p className="text-gray-600">No children are currently linked to your account.</p>
+        <div className="bg-white rounded-xl border border-gold/20 shadow-card p-12 text-center">
+          <Users className="w-16 h-16 text-charcoal/20 mx-auto mb-4" />
+          <h3 className="font-display text-lg font-semibold text-navy mb-2">Chưa Liên Kết Học Viên</h3>
+          <p className="font-body text-charcoal/70">Chưa có học viên nào được liên kết với tài khoản.</p>
         </div>
       </div>
     );
@@ -56,22 +55,22 @@ function ParentGradesPageContent() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Grades</h1>
-        <p className="text-gray-600">View published grades for your children</p>
+        <h1 className="font-display text-2xl font-bold text-navy">Kết Quả Học Tập</h1>
+        <p className="font-body text-charcoal/70">Xem kết quả học tập đã công bố của con em</p>
       </div>
 
       {students.length > 1 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Select a Child</h2>
+        <div className="bg-white rounded-xl border border-gold/20 shadow-card p-6">
+          <h2 className="font-display text-lg font-semibold text-navy mb-4">Chọn Học Viên</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {students.map((student) => (
               <button
                 key={student.id}
                 onClick={() => setSelectedStudentId(selectedStudentId === student.id ? null : student.id)}
-                className={`p-4 rounded-lg border transition-colors text-left ${
+                className={`p-4 rounded-xl border transition-colors text-left ${
                   selectedStudentId === student.id
-                    ? 'bg-blue-50 border-blue-200'
-                    : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                    ? 'bg-primary/5 border-primary/30'
+                    : 'bg-cream-dark border-gold/20 hover:bg-primary/5'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -82,15 +81,15 @@ function ParentGradesPageContent() {
                       className="w-10 h-10 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center">
-                      <span className="text-sm font-semibold text-blue-600">
+                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                      <span className="font-display text-sm font-semibold text-primary">
                         {student.first_name[0]}{student.last_name[0]}
                       </span>
                     </div>
                   )}
                   <div>
-                    <h3 className="font-medium text-gray-900">{student.full_name}</h3>
-                    <p className="text-xs text-gray-600">{student.grade}</p>
+                    <h3 className="font-body font-medium text-navy">{student.full_name}</h3>
+                    <p className="font-body text-xs text-charcoal/70">{student.grade}</p>
                   </div>
                 </div>
               </button>
@@ -100,37 +99,37 @@ function ParentGradesPageContent() {
       )}
 
       {/* Grades Display */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          {selectedStudent ? `${selectedStudent.full_name}'s Grades` : 'All Grades'}
+      <div className="bg-white rounded-xl border border-gold/20 shadow-card p-6">
+        <h2 className="font-display text-lg font-semibold text-navy mb-4">
+          {selectedStudent ? `Kết quả của ${selectedStudent.full_name}` : 'Tất cả kết quả'}
         </h2>
-        
+
         {publishedGrades.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <Award className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-            <p>No published grades available yet</p>
-            <p className="text-sm mt-2">Grades will appear here once published by teachers</p>
+          <div className="text-center py-12 text-charcoal/50">
+            <Award className="w-12 h-12 mx-auto mb-3 text-charcoal/20" />
+            <p className="font-body">Chưa có kết quả nào được công bố</p>
+            <p className="font-body text-sm mt-2">Kết quả sẽ hiển thị ở đây khi giảng viên công bố</p>
           </div>
         ) : (
           <div className="space-y-3">
             {publishedGrades.map((grade) => (
               <div
                 key={grade.id}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200"
+                className="flex items-center justify-between p-4 bg-cream-dark rounded-xl border border-gold/10"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <BookOpen className="w-5 h-5 text-blue-600" />
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <BookOpen className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-gray-900">{grade.subject}</h3>
-                    <p className="text-xs text-gray-500">{new Date(grade.date).toLocaleDateString()}</p>
+                    <h3 className="font-body font-medium text-navy">{grade.subject}</h3>
+                    <p className="font-body text-xs text-charcoal/50">{new Date(grade.date).toLocaleDateString('vi-VN')}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-lg font-bold text-green-600">{grade.grade}</span>
+                  <span className="font-display text-lg font-bold text-primary">{grade.grade}</span>
                   {grade.percentage && (
-                    <p className="text-xs text-gray-500">{grade.percentage}%</p>
+                    <p className="font-body text-xs text-charcoal/50">{grade.percentage}%</p>
                   )}
                 </div>
               </div>

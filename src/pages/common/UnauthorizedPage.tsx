@@ -1,39 +1,44 @@
 import { useNavigate } from 'react-router-dom';
-import { ShieldOff, ArrowLeft } from 'lucide-react';
+import { useAuth } from '../../domains/auth/contexts/AuthContext';
 
 export function UnauthorizedPage() {
   const navigate = useNavigate();
+  const { signOut, user } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/', { replace: true });
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="bg-cream min-h-screen flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center">
         <div className="mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-4">
-            <ShieldOff className="w-10 h-10 text-red-600" />
+          <div className="bg-primary/10 rounded-full w-40 h-40 flex items-center justify-center mx-auto mb-8">
+            <span className="text-primary font-display" style={{ fontSize: '6rem', lineHeight: 1 }}>𝄢</span>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">403</h1>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Access Denied</h2>
-          <p className="text-gray-600 mb-8">
-            You don't have permission to access this page. Please contact your administrator if you
-            believe this is an error.
+          <h1 className="font-display text-8xl font-bold text-primary mb-4">403</h1>
+          <h2 className="font-display text-3xl font-bold text-navy mb-4">Không Có Quyền Truy Cập</h2>
+          <p className="font-body text-charcoal mb-10 leading-relaxed">
+            Bạn không có quyền xem trang này. Vui lòng liên hệ quản trị viên nếu bạn cho rằng đây là lỗi.
           </p>
         </div>
 
-        <div className="space-y-3">
-          <button
-            onClick={() => navigate(-1)}
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Go Back
-          </button>
-
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button
             onClick={() => navigate('/')}
-            className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="bg-primary text-white hover:bg-primary-light rounded-lg px-8 py-3 font-body font-semibold transition-colors shadow-card"
           >
-            Go to Dashboard
+            Về Trang Chủ
           </button>
+          {user && (
+            <button
+              onClick={handleSignOut}
+              className="border-2 border-primary text-primary hover:bg-primary/5 rounded-lg px-8 py-3 font-body font-semibold transition-colors"
+            >
+              Đăng Xuất
+            </button>
+          )}
         </div>
       </div>
     </div>

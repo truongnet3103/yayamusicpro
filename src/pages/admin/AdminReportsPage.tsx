@@ -5,37 +5,37 @@ import { RoleGuard } from '../../shared/components/guards/RoleGuard';
 import { PermissionGuard } from '../../shared/components/guards/PermissionGuard';
 
 function AdminReportsPageContent() {
-  const { profile } = useUser();
+  useUser();
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
 
   const reportTypes = [
     {
       id: 'attendance',
-      name: 'Attendance Report',
-      description: 'Daily, weekly, and monthly attendance statistics',
+      name: 'Báo Cáo Điểm Danh',
+      description: 'Thống kê điểm danh theo ngày, tuần và tháng',
       icon: Calendar,
-      color: 'bg-blue-100 text-blue-600',
+      color: 'bg-primary/10 text-primary',
     },
     {
       id: 'students',
-      name: 'Student Report',
-      description: 'Student enrollment and demographics',
+      name: 'Báo Cáo Học Viên',
+      description: 'Số liệu tuyển sinh và nhân khẩu học',
       icon: Users,
-      color: 'bg-green-100 text-green-600',
+      color: 'bg-gold/20 text-gold',
     },
     {
       id: 'academic',
-      name: 'Academic Performance',
-      description: 'Grades, assessments, and academic trends',
+      name: 'Kết Quả Học Tập',
+      description: 'Điểm số, đánh giá và xu hướng học tập',
       icon: TrendingUp,
-      color: 'bg-purple-100 text-purple-600',
+      color: 'bg-navy/10 text-navy',
     },
     {
       id: 'classes',
-      name: 'Class Report',
-      description: 'Class enrollment and performance metrics',
+      name: 'Báo Cáo Lớp Học',
+      description: 'Số liệu tuyển sinh và hiệu suất lớp học',
       icon: BookOpen,
-      color: 'bg-orange-100 text-orange-600',
+      color: 'bg-green-100 text-green-700',
     },
   ];
 
@@ -43,13 +43,13 @@ function AdminReportsPageContent() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
-          <p className="text-gray-600">Generate and view system reports</p>
+          <h1 className="text-2xl font-bold text-navy font-display">Báo Cáo &amp; Thống Kê</h1>
+          <p className="text-charcoal/60 font-body text-sm mt-1">Tạo và xem các báo cáo hệ thống</p>
         </div>
         {selectedReport && (
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            <Download className="w-5 h-5" />
-            <span>Export Report</span>
+          <button className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-lg hover:bg-primary-light transition-colors font-body font-semibold text-sm shadow-sm">
+            <Download className="w-4 h-4" />
+            <span>Xuất báo cáo</span>
           </button>
         )}
       </div>
@@ -62,17 +62,17 @@ function AdminReportsPageContent() {
             <button
               key={report.id}
               onClick={() => setSelectedReport(report.id)}
-              className={`bg-white rounded-lg shadow-sm border-2 p-6 text-left hover:shadow-md transition-all ${
+              className={`bg-white rounded-xl shadow-card border-2 p-6 text-left hover:shadow-elegant transition-all ${
                 selectedReport === report.id
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200'
+                  ? 'border-primary bg-primary/5'
+                  : 'border-gold/20 hover:border-gold/40'
               }`}
             >
-              <div className={`w-12 h-12 rounded-lg ${report.color} flex items-center justify-center mb-4`}>
+              <div className={`w-12 h-12 rounded-xl ${report.color} flex items-center justify-center mb-4`}>
                 <Icon className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">{report.name}</h3>
-              <p className="text-sm text-gray-600">{report.description}</p>
+              <h3 className="text-base font-semibold text-navy font-body mb-1.5">{report.name}</h3>
+              <p className="text-sm text-charcoal/60 font-body">{report.description}</p>
             </button>
           );
         })}
@@ -80,12 +80,12 @@ function AdminReportsPageContent() {
 
       {/* Report Content */}
       {selectedReport ? (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-xl shadow-card border border-gold/20 p-6">
           <div className="mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            <h2 className="text-xl font-semibold text-navy font-display mb-1">
               {reportTypes.find(r => r.id === selectedReport)?.name}
             </h2>
-            <p className="text-gray-600">
+            <p className="text-charcoal/60 font-body text-sm">
               {reportTypes.find(r => r.id === selectedReport)?.description}
             </p>
           </div>
@@ -93,42 +93,42 @@ function AdminReportsPageContent() {
           {/* Report Filters */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
-              <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option>Last 7 days</option>
-                <option>Last 30 days</option>
-                <option>Last 90 days</option>
-                <option>This year</option>
-                <option>Custom range</option>
+              <label className="block text-xs font-medium text-charcoal/70 font-body mb-1.5">Khoảng thời gian</label>
+              <select className="w-full px-3 py-2 border border-gold/40 rounded-lg font-body text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white">
+                <option>7 ngày qua</option>
+                <option>30 ngày qua</option>
+                <option>90 ngày qua</option>
+                <option>Năm nay</option>
+                <option>Tùy chỉnh</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Format</label>
-              <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <label className="block text-xs font-medium text-charcoal/70 font-body mb-1.5">Định dạng</label>
+              <select className="w-full px-3 py-2 border border-gold/40 rounded-lg font-body text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white">
                 <option>PDF</option>
                 <option>Excel</option>
                 <option>CSV</option>
               </select>
             </div>
             <div className="flex items-end">
-              <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                Generate Report
+              <button className="w-full px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-light transition-colors font-body font-semibold text-sm">
+                Tạo báo cáo
               </button>
             </div>
           </div>
 
           {/* Report Preview Placeholder */}
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center">
-            <BarChart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Report Preview</h3>
-            <p className="text-gray-600">Select filters and click "Generate Report" to view data</p>
+          <div className="border-2 border-dashed border-gold/30 rounded-xl p-12 text-center bg-cream/40">
+            <BarChart className="w-16 h-16 text-gold/30 mx-auto mb-4" />
+            <h3 className="text-base font-semibold text-navy font-display mb-2">Xem trước báo cáo</h3>
+            <p className="text-charcoal/60 font-body text-sm">Chọn bộ lọc và nhấn "Tạo báo cáo" để xem dữ liệu</p>
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-          <BarChart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Select a report type</h3>
-          <p className="text-gray-600">Choose a report from above to view and generate reports</p>
+        <div className="bg-white rounded-xl shadow-card border border-gold/20 p-12 text-center">
+          <BarChart className="w-16 h-16 text-gold/30 mx-auto mb-4" />
+          <h3 className="text-base font-semibold text-navy font-display mb-2">Chọn loại báo cáo</h3>
+          <p className="text-charcoal/60 font-body text-sm">Chọn một loại báo cáo ở trên để xem và tạo báo cáo</p>
         </div>
       )}
     </div>

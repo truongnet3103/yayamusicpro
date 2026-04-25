@@ -1,8 +1,8 @@
 /**
  * Teacher Dashboard
- * 
+ *
  * Role: Teacher
- * 
+ *
  * TODO: Backend must validate:
  * - User has 'classes:read' and 'attendance:mark' capabilities
  * - Teacher can only see their own classes
@@ -41,62 +41,62 @@ function TeacherDashboardContent() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Teacher Dashboard</h1>
-        <p className="text-gray-600">Welcome back, {profile?.first_name}!</p>
+        <h1 className="text-2xl font-bold text-navy font-display">Tổng Quan Giảng Viên</h1>
+        <p className="text-charcoal/60 font-body text-sm mt-1">Xin chào, {profile?.first_name}!</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-xl shadow-card border border-gold/20 p-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <BookOpen className="w-6 h-6 text-blue-600" />
+            <div className="p-3 bg-primary/10 rounded-xl">
+              <BookOpen className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Today's Classes</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-xs text-charcoal/60 font-body">Lớp hôm nay</p>
+              <p className="text-2xl font-bold text-navy font-display">
                 {overview?.today_classes.length || 0}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-xl shadow-card border border-gold/20 p-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-green-100 rounded-lg">
-              <Users className="w-6 h-6 text-green-600" />
+            <div className="p-3 bg-gold/20 rounded-xl">
+              <Users className="w-5 h-5 text-gold" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Total Students</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-xs text-charcoal/60 font-body">Tổng học viên</p>
+              <p className="text-2xl font-bold text-navy font-display">
                 {overview?.total_students || 0}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-xl shadow-card border border-gold/20 p-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-100 rounded-lg">
-              <CheckSquare className="w-6 h-6 text-purple-600" />
+            <div className="p-3 bg-navy/10 rounded-xl">
+              <CheckSquare className="w-5 h-5 text-navy" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Attendance Rate</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-xs text-charcoal/60 font-body">Tỷ lệ điểm danh</p>
+              <p className="text-2xl font-bold text-navy font-display">
                 {overview?.attendance_rate ? `${overview.attendance_rate}%` : '0%'}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-xl shadow-card border border-gold/20 p-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-orange-100 rounded-lg">
-              <Clock className="w-6 h-6 text-orange-600" />
+            <div className="p-3 bg-orange-100 rounded-xl">
+              <Clock className="w-5 h-5 text-orange-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Pending Tasks</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-xs text-charcoal/60 font-body">Việc cần làm</p>
+              <p className="text-2xl font-bold text-navy font-display">
                 {overview?.pending_tasks || 0}
               </p>
             </div>
@@ -105,108 +105,108 @@ function TeacherDashboardContent() {
       </div>
 
       {/* Today's Schedule */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Today's Schedule</h2>
+      <div className="bg-white rounded-xl shadow-card border border-gold/20 p-6">
+        <h2 className="text-lg font-semibold text-navy font-display mb-4">Lịch Dạy Hôm Nay</h2>
         {overview?.today_classes && overview.today_classes.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {overview.today_classes.map((cls) => (
               <div
                 key={cls.id}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                className="flex items-center justify-between p-4 bg-cream rounded-xl hover:bg-cream-dark transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-blue-100 rounded-lg">
-                    <BookOpen className="w-5 h-5 text-blue-600" />
+                  <div className="p-2.5 bg-primary/10 rounded-lg">
+                    <BookOpen className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-gray-900">{cls.name}</h3>
-                    <p className="text-sm text-gray-600">
-                      {cls.room} • {cls.students} students
+                    <h3 className="font-semibold text-navy font-body text-sm">{cls.name}</h3>
+                    <p className="text-xs text-charcoal/60 font-body mt-0.5">
+                      {cls.room} • {cls.students} học viên
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-sm font-medium text-gray-700">{cls.time}</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium text-charcoal/70 font-body">{cls.time}</span>
                   <button
                     onClick={() => handleMarkAttendance(cls.id)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary-light transition-colors font-body font-semibold text-xs shadow-sm"
                   >
-                    Mark Attendance
+                    Điểm danh
                   </button>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 text-gray-500">
-            <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-            <p>No classes scheduled for today</p>
+          <div className="text-center py-12 text-charcoal/50">
+            <Calendar className="w-12 h-12 mx-auto mb-3 text-gold/30" />
+            <p className="font-body text-sm">Không có lớp học nào hôm nay</p>
           </div>
         )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Quick Actions */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+        <div className="bg-white rounded-xl shadow-card border border-gold/20 p-6">
+          <h2 className="text-lg font-semibold text-navy font-display mb-4">Thao Tác Nhanh</h2>
           <div className="grid grid-cols-2 gap-4">
             <Link
               to="/teacher/attendance"
-              className="p-4 text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+              className="p-4 text-left bg-primary/5 hover:bg-primary/10 rounded-xl border border-primary/20 transition-colors"
             >
-              <CheckSquare className="w-6 h-6 text-blue-600 mb-2" />
-              <p className="text-sm font-medium text-gray-900">Mark Attendance</p>
+              <CheckSquare className="w-5 h-5 text-primary mb-2" />
+              <p className="text-sm font-medium text-navy font-body">Điểm danh</p>
             </Link>
             <Link
               to="/teacher/classes"
-              className="p-4 text-left bg-green-50 hover:bg-green-100 rounded-lg transition-colors"
+              className="p-4 text-left bg-gold/10 hover:bg-gold/20 rounded-xl border border-gold/30 transition-colors"
             >
-              <BookOpen className="w-6 h-6 text-green-600 mb-2" />
-              <p className="text-sm font-medium text-gray-900">View Classes</p>
+              <BookOpen className="w-5 h-5 text-gold mb-2" />
+              <p className="text-sm font-medium text-navy font-body">Lớp của tôi</p>
             </Link>
             <Link
               to="/teacher/gradebook"
-              className="p-4 text-left bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors"
+              className="p-4 text-left bg-navy/5 hover:bg-navy/10 rounded-xl border border-navy/20 transition-colors"
             >
-              <Award className="w-6 h-6 text-purple-600 mb-2" />
-              <p className="text-sm font-medium text-gray-900">Gradebook</p>
+              <Award className="w-5 h-5 text-navy mb-2" />
+              <p className="text-sm font-medium text-navy font-body">Nhật ký tiến độ</p>
             </Link>
             <Link
               to="/teacher/schedule"
-              className="p-4 text-left bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"
+              className="p-4 text-left bg-orange-50 hover:bg-orange-100 rounded-xl border border-orange-200 transition-colors"
             >
-              <Calendar className="w-6 h-6 text-orange-600 mb-2" />
-              <p className="text-sm font-medium text-gray-900">Schedule</p>
+              <Calendar className="w-5 h-5 text-orange-500 mb-2" />
+              <p className="text-sm font-medium text-navy font-body">Lịch dạy</p>
             </Link>
           </div>
         </div>
 
         {/* Recent Notifications */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-xl shadow-card border border-gold/20 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Recent Notifications</h2>
+            <h2 className="text-lg font-semibold text-navy font-display">Thông Báo Gần Đây</h2>
             <Link
               to="/teacher/notifications"
-              className="text-sm text-blue-600 hover:text-blue-700"
+              className="text-sm text-primary hover:text-primary-light font-body transition-colors"
             >
-              View All
+              Xem tất cả
             </Link>
           </div>
           <div className="space-y-3">
             {recentNotifications.length > 0 ? (
               recentNotifications.map((notification) => (
                 <div key={notification.id} className="flex items-start gap-3">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
+                  <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
                   <div>
-                    <p className="text-sm text-gray-900">{notification.title}</p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(notification.timestamp).toLocaleString()}
+                    <p className="text-sm text-charcoal font-body">{notification.title}</p>
+                    <p className="text-xs text-charcoal/40 font-body mt-0.5">
+                      {new Date(notification.timestamp).toLocaleString('vi-VN')}
                     </p>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-gray-500 text-center py-4">No recent notifications</p>
+              <p className="text-sm text-charcoal/50 font-body text-center py-4">Không có thông báo mới</p>
             )}
           </div>
         </div>
