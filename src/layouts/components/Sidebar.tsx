@@ -18,6 +18,7 @@ import {
   Bell,
   GraduationCap,
   Clock,
+  Layout,
 } from 'lucide-react';
 import { useUser, UserRole } from '../../domains/auth/contexts/UserContext';
 
@@ -33,6 +34,7 @@ const navigationByRole: Record<UserRole, NavItem[]> = {
     { icon: Users, label: 'Quản Lý Tài Khoản', path: '/admin/users' },
     { icon: BookOpen, label: 'Lớp học', path: '/admin/classes' },
     { icon: Clock, label: 'Khung giờ', path: '/admin/schedule-slots' },
+    { icon: Layout, label: 'Nội dung trang chủ', path: '/admin/cms' },
   ],
   teacher: [
     { icon: LayoutDashboard, label: 'Tổng quan', path: '/teacher' },
@@ -82,6 +84,7 @@ const navigationByRole: Record<UserRole, NavItem[]> = {
     { icon: Clock, label: 'Khung giờ', path: '/admin/schedule-slots' },
     { icon: TrendingUp, label: 'Gói dịch vụ', path: '/superadmin/subscriptions' },
     { icon: Activity, label: 'Nhật ký', path: '/superadmin/logs' },
+    { icon: Layout, label: 'Nội dung trang chủ', path: '/admin/cms' },
   ],
 };
 

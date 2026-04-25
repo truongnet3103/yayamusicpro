@@ -4,6 +4,9 @@ import { RoleRoute } from '../domains/auth/components/RoleRoute';
 import { DashboardLayout } from '../layouts/components/DashboardLayout';
 
 import { HomePage } from '../pages/public/HomePage';
+import { PricingPage } from '../pages/public/PricingPage';
+import AboutPage from '../pages/public/AboutPage';
+import BlogPage from '../pages/public/BlogPage';
 import { LoginPage } from '../pages/auth/LoginPage';
 import { ForgotPasswordPage } from '../pages/auth/ForgotPasswordPage';
 import { UnauthorizedPage } from '../pages/common/UnauthorizedPage';
@@ -17,6 +20,7 @@ import { AdminClassesPage } from '../pages/admin/AdminClassesPage';
 import { AdminScheduleSlotsPage } from '../pages/admin/AdminScheduleSlotsPage';
 import { AdminReportsPage } from '../pages/admin/AdminReportsPage';
 import { AdminSettingsPage } from '../pages/admin/AdminSettingsPage';
+import AdminCmsPage from '../pages/admin/AdminCmsPage';
 import { TeacherDashboard } from '../pages/teacher/TeacherDashboard';
 import { TeacherClassesPage } from '../pages/teacher/TeacherClassesPage';
 import { TeacherAttendancePage } from '../pages/teacher/TeacherAttendancePage';
@@ -106,6 +110,9 @@ export function AppRouter() {
       <Routes>
         <Route path="/" element={<RootRedirect />} />
         <Route path="/landingpage" element={<HomePage />} />
+        <Route path="/hoc-phi" element={<PricingPage />} />
+        <Route path="/ve-chung-toi" element={<AboutPage />} />
+        <Route path="/blog" element={<BlogPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
@@ -135,6 +142,10 @@ export function AppRouter() {
               <Route path="/admin/roles" element={<AdminRolesPage />} />
               <Route path="/admin/reports" element={<AdminReportsPage />} />
               <Route path="/admin/settings" element={<AdminSettingsPage />} />
+            </Route>
+
+            <Route element={<RoleRoute allowedRoles={['admin', 'super_admin']} />}>
+              <Route path="/admin/cms" element={<AdminCmsPage />} />
             </Route>
 
             <Route element={<RoleRoute allowedRoles={['admin', 'staff', 'super_admin']} />}>
